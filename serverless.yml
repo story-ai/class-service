@@ -1,4 +1,4 @@
-service: story-sample
+service: story-class
 
 provider:
   name: aws
@@ -22,27 +22,24 @@ package:
 functions:
 
   create:
-    handler: handlers/sample.index
+    handler: handlers/get_classes.index
     environment:
-      SECRET_CODE: ${file(keys.yml):SECRET_CODE}
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
     events:
       - http:
           path: /
-          method: post
+          method: get
           cors: true
           documentation:
-            summary: Add a thing
+            summary: Get all available classes
             tags: 
-              - sample
-            requestBody:
-              description: JSON body
-            requestModels:
-                "application/json": SampleRequest
+              - class
             methodResponses:
               - statusCode: "200"
-                description: Returned after the thing has been done
+                description: Classes were fetched successfully
                 responseModels:
-                  "application/json": SampleResponse
+                  "application/json": ClassResponse
 
 resources:
   Resources:
@@ -93,7 +90,7 @@ resources:
 custom:
   customDomain:
     domainName: api.axontoken.com
-    basePath: sample
+    basePath: class
     stage: ${self:provider.stage}
     createRoute53Record: true
 

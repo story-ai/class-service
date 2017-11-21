@@ -13,11 +13,13 @@
   "license": "MIT",
   "dependencies": {
     "@sendgrid/mail": "^6.1.4",
+    "@types/jwt-decode": "^2.2.1",
     "aws-sdk": "^2.145.0",
     "boom": "^5.2.0",
+    "jwt-decode": "^2.2.0",
     "node-fetch": "^1.7.3",
     "randomatic": "^2.0.0",
-    "serverless-spec-uploader": "^0.1.0",
+    "serverless-spec-uploader": "^0.1.1",
     "story-backend-utils": "^0.1.0"
   },
   "devDependencies": {

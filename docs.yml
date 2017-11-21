@@ -1,7 +1,7 @@
 info:
   version: "0.1.0"
-  title: Story Sample Service
-  description: A sample API running on the Story infrastructure
+  title: Story Class Service
+  description: A simple API for retrieving Story classes
   contact:
     name: Christopher Little
     url: https://story-ai.com
@@ -13,29 +13,15 @@ functions:
     path: /spec
     method: get
     documentation:
-      summary: Retrieve the spec for the user service
+      summary: Retrieve the spec for the class service
       tags: 
         - user
-      requestBody:
-        description: <No Body>
       methodResponses:
         - statusCode: "200"
           description: Returns the specification
 
 models:
-  - name: SampleRequest
-    description: The request required for this sample
-    contentType: application/json
-    schema:
-      type: object
-      properties:
-        code:
-          type: string
-          format: string
-      required:
-        - code
-
-  - name: SampleResponse
+  - name: ClassResponse
     description: The thing returned by this sample service
     contentType: application/json
     schema:
