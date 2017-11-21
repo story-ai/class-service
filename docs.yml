@@ -1,0 +1,47 @@
+info:
+  version: "0.1.0"
+  title: Story Sample Service
+  description: A sample API running on the Story infrastructure
+  contact:
+    name: Christopher Little
+    url: https://story-ai.com
+    email: christopher@story-ai.com
+
+# TODO: This documentation should get pushed into serverless-spec-uploader
+functions: 
+  spec:
+    path: /spec
+    method: get
+    documentation:
+      summary: Retrieve the spec for the user service
+      tags: 
+        - user
+      requestBody:
+        description: <No Body>
+      methodResponses:
+        - statusCode: "200"
+          description: Returns the specification
+
+models:
+  - name: SampleRequest
+    description: The request required for this sample
+    contentType: application/json
+    schema:
+      type: object
+      properties:
+        code:
+          type: string
+          format: string
+      required:
+        - code
+
+  - name: SampleResponse
+    description: The thing returned by this sample service
+    contentType: application/json
+    schema:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success

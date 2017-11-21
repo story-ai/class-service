@@ -1,0 +1,58 @@
+= Story Sample Service
+Christopher Little <christopher@story-ai.com>
+:imagesdir: assets
+
+This service provides a boilerplate for other Story services.
+It is mostly written in TypeScript, and runs off-chain on a private cloud to
+protect API keys. It is currently
+deployed at https://api.axontoken.com.
+
+== Documentation
+
+The API is documented with an
+https://github.com/OAI/OpenAPI-Specification[OpenAPI] specification, which is
+served on the `{service-base}/spec` endpoint. We currently use this specification to 
+generate automated documentation, but it will also be used to generate client libraries.
+
+Sample Service:: 
+http://petstore.swagger.io/?url=https://api.axontoken.com/sample/spec[Documentation]
+(https://api.axontoken.com/sample/spec[specification])
+
+== Run it yourself
+
+This service runs on a serverless architecture (currently targetting AWS),
+and is managed with the https://serverless.com/[Serverless Framework]. We
+take advantage of the
+https://github.com/dherault/serverless-offline[serverless-offline] plugin for
+rapid development without deployment.
+
+=== Installation
+
+```
+npm install serverless -g                                   
+git clone git@github.com:story-ai/sample-service.git
+cd sample-service
+npm install                                                 
+vim keys.yml    # Edit to add correct credentials and API keys
+```
+
+=== Local
+```
+serverless offline
+```
+
+=== Deploy to AWS
+http://docs.aws.amazon.com/cli/latest/userguide/installing.html[Install]
+and http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html[configure] the AWS cli.
+Then run: 
+
+```
+serverless deploy
+```
+
+
+== Contributing
+
+Contributions are welcome! Suggestions for amenable problems will be added
+here as they are discovered.
+

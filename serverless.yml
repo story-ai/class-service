@@ -1,0 +1,102 @@
+service: story-sample
+
+provider:
+  name: aws
+  region: eu-west-2
+  runtime: nodejs6.10
+  stage: dev
+  profile: serverless
+
+plugins:
+  - serverless-plugin-typescript  # compile our handlers
+  - serverless-offline            # enjoy a local dev env 
+  - serverless-aws-documentation  # generate documentation on deploy
+  - serverless-domain-manager     # serve API gateway from our own domain
+  - serverless-spec-uploader      # upload spec to S3 after deployment
+
+package:
+  exclude:
+    - .gitignore
+    - .git/**
+
+functions:
+
+  create:
+    handler: handlers/sample.index
+    environment:
+      SECRET_CODE: ${file(keys.yml):SECRET_CODE}
+    events:
+      - http:
+          path: /
+          method: post
+          cors: true
+          documentation:
+            summary: Add a thing
+            tags: 
+              - sample
+            requestBody:
+              description: JSON body
+            requestModels:
+                "application/json": SampleRequest
+            methodResponses:
+              - statusCode: "200"
+                description: Returned after the thing has been done
+                responseModels:
+                  "application/json": SampleResponse
+
+resources:
+  Resources:
+
+    # Name the API something more memorable in API Gateway
+    ApiGatewayRestApi:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: Class Service
+
+    # Add a proxy resource in API Gateway to represent the API spec
+    # TODO: Move this into serverless-spec-uploader
+    ProxyResource:
+      Type: AWS::ApiGateway::Resource
+      Properties:
+        ParentId:
+          Fn::GetAtt:
+            - ApiGatewayRestApi
+            - RootResourceId
+        PathPart: spec 
+        RestApiId:
+          Ref: ApiGatewayRestApi
+          
+    # Add a proxy method to API Gateway to retrieve the spec from S3
+    # TODO: Move this into serverless-spec-uploader
+    ProxyMethod:
+      Type: AWS::ApiGateway::Method
+      Properties:
+        ResourceId:
+          Ref: ProxyResource
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        HttpMethod: GET 
+        AuthorizationType: NONE
+        MethodResponses:
+          - StatusCode: "200"
+            ResponseParameters: 
+              method.response.header.Access-Control-Allow-Origin: true
+        Integration:
+          IntegrationHttpMethod: GET
+          Type: HTTP
+          Uri: https://s3.eu-west-2.amazonaws.com/${self:custom.spec_bucket}/${self:service}.json
+          IntegrationResponses:
+            - StatusCode: "200"
+              ResponseParameters:
+                method.response.header.Access-Control-Allow-Origin : "'*'"
+
+custom:
+  customDomain:
+    domainName: api.axontoken.com
+    basePath: sample
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+
+  documentation: ${file(docs.yml)}
+
+  spec_bucket: story-ai-specs
