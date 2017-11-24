@@ -20,40 +20,30 @@ const dynamodb = new DynamoDB({
 const Result = Promise;
 
 type HandlerResult = {
-  [id: string]: StoryTypes.Class;
+  classes: {
+    [id: string]: StoryTypes.Class;
+  };
 };
 
-async function handler(ids: string[]): Result<HandlerResult> {
+async function handler(): Result<HandlerResult> {
   // get an admin login token for century
   let token = await getToken();
 
   // get all class from dynamo
-  const result: HandlerResult = keyBy(await getStoryClassesById(ids), "_id");
+  const classes = keyBy(await getStoryClasses(), "_id");
   return {
-    result,
+    result: { classes },
     statusCode: 200
   };
 }
 
-async function getStoryClassesById(ids: string[]): Promise<StoryTypes.Class[]> {
+async function getStoryClasses(): Promise<StoryTypes.Class[]> {
   const params = {
-    RequestItems: {
-      "story-class": {
-        Keys: ids.map(id => ({
-          _id: {
-            S: id
-          }
-        }))
-      }
-    }
+    TableName: "story-class"
   };
-  const result = await dynamodb.batchGetItem(params).promise();
-  if (
-    result.Responses === undefined ||
-    result.Responses["story-class"] === undefined
-  )
-    return [];
-  return result.Responses["story-class"].map(item => ({
+  const result = await dynamodb.scan(params).promise();
+  if (result.Items === undefined) return [];
+  return result.Items.map(item => ({
     _id: item._id.S!,
     price: parseFloat(item.price.N!),
     meta: item.meta.S!,
@@ -63,6 +53,5 @@ async function getStoryClassesById(ids: string[]): Promise<StoryTypes.Class[]> {
 }
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
-  const req = (e.queryStringParameters!["ids"] || "").split(/,\s*/);
-  serialiseLambda(done, () => handler(req));
+  serialiseLambda(done, handler);
 }

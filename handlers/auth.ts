@@ -7,8 +7,6 @@ let token: string | null = null;
 let expiry: Date | null = null;
 
 export const fetchToken: () => Promise<string> = () => {
-  console.log("Fetching new token");
-
   return fetch("https://api.century.tech/accounts/v2/login-sessions", {
     method: "POST",
     headers: { "content-type": "application/json" },

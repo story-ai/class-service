@@ -21,25 +21,98 @@ package:
 
 functions:
 
-  create:
-    handler: handlers/get_classes.index
+  root:
+    handler: handlers/get_root.index
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      AWS_PROFILE: serverless
     events:
       - http:
           path: /
           method: get
           cors: true
           documentation:
-            summary: Get all available classes
+            summary: Get a list of class IDs available through Story
             tags: 
               - class
             methodResponses:
               - statusCode: "200"
                 description: Classes were fetched successfully
                 responseModels:
+                  "application/json": RootResponse
+
+  classes:
+    handler: handlers/get_classes.index
+    environment:
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      AWS_PROFILE: serverless
+    events:
+      - http:
+          path: /class
+          method: get
+          cors: true
+          documentation:
+            summary: Get details for all classes with the given IDs
+            tags: 
+              - class
+            queryParams:
+              - name: ids
+                description: Class IDs to fetch
+            methodResponses:
+              - statusCode: "200"
+                description: Classes were fetched successfully
+                responseModels:
                   "application/json": ClassResponse
+
+  teachers:
+    handler: handlers/get_teachers.index
+    environment:
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      AWS_PROFILE: serverless
+    events:
+      - http:
+          path: /teacher
+          method: get
+          cors: true
+          documentation:
+            summary: Get all teachers for the given IDs
+            tags: 
+              - class
+            queryParams:
+              - name: ids
+                description: Teacher IDs to fetch
+            methodResponses:
+              - statusCode: "200"
+                description: Teachers were fetched successfully
+                responseModels:
+                  "application/json": TeacherResponse
+
+  courses:
+    handler: handlers/get_courses.index
+    environment:
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      AWS_PROFILE: serverless
+    events:
+      - http:
+          path: /course
+          method: get
+          cors: true
+          documentation:
+            summary: Get all courses for the given IDs
+            tags: 
+              - class
+            queryParams:
+              - name: ids
+                description: Course IDs to fetch
+            methodResponses:
+              - statusCode: "200"
+                description: Courses were fetched successfully
+                responseModels:
+                  "application/json": CourseResponse
 
 resources:
   Resources:
@@ -90,7 +163,7 @@ resources:
 custom:
   customDomain:
     domainName: api.axontoken.com
-    basePath: class
+    basePath: material
     stage: ${self:provider.stage}
     createRoute53Record: true
 

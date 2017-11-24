@@ -1,5 +1,5 @@
 info:
-  version: "0.1.0"
+  version: "0.1.1"
   title: Story Class Service
   description: A simple API for retrieving Story classes
   contact:
@@ -21,13 +21,194 @@ functions:
           description: Returns the specification
 
 models:
-  - name: ClassResponse
-    description: The thing returned by this sample service
+  - name: RootResponse
+    description: A list of class IDs available through Story
     contentType: application/json
     schema:
       type: object
       properties:
-        success:
-          type: boolean
-      required:
-        - success
+        classes:
+          type: object
+          # additionalProperties: string
+          # additionalProperties: $(self:submodels.Class)
+          # additionalProperties:
+          # type: 
+          #  $ref: 
+          #     Fn::Join: 
+          #       - ""
+          #       - - https://apigateway.amazonaws.com/restapis/
+          #         - Ref: ApiGatewayRestApi
+          #         - /models/ClassModel
+
+
+  - name: ClassResponse
+    description: A list of class details
+    contentType: application/json
+    schema:
+      type: object
+      # additionalProperties: string
+      # additionalProperties:
+      #   type: 
+      #     $ref: 
+      #       Fn::Join: 
+      #         - ""
+      #         - - https://apigateway.amazonaws.com/restapis/
+      #           - Ref: ApiGatewayRestApi
+      #           - /models/ClassModel
+
+  - name: TeacherResponse
+    description: A list of teacher details
+    contentType: application/json
+    schema:
+      type: object
+      # additionalProperties: string
+      # additionalProperties: $(self:submodels.Teacher)
+      # additionalProperties:
+      #   type: 
+      #     $ref: 
+      #       Fn::Join: 
+      #         - ""
+      #         - - https://apigateway.amazonaws.com/restapis/
+      #           - Ref: ApiGatewayRestApi
+      #           - /models/TeacherModel
+
+  - name: CourseResponse
+    description: A list of course details
+    contentType: application/json
+    schema:
+      type: object
+      # additionalProperties: string
+      # additionalProperties: $(self:submodels.Course)
+      # additionalProperties:
+          # $ref: 
+          #   Fn::Join: 
+          #     - ""
+          #     - - https://apigateway.amazonaws.com/restapis/
+          #       - Ref: ApiGatewayRestApi
+          #       - /models/CourseModel
+
+  - name: Teacher
+    description: A Story teacher
+    contentType: application/json
+    schema:
+      type: object
+      properties:
+        _id: 
+          type: string
+          format: uuid
+        meta:
+          type: string
+        personal:
+          type: object
+          properties:
+            ethnicity: 
+              type: object
+            gender: 
+              type: string
+            name: 
+              type: object
+        profile:
+          type: object
+          properties:
+            avatar: 
+              type: string
+            groups: 
+              type: object
+              properties:
+                roles: 
+                  type: array
+                  items: 
+                    type: string
+                    format: uuid
+            extra: 
+              type: object
+            grades: 
+              type: array
+              items: 
+                type: object
+            ids: 
+              type: array
+              items: 
+                type: object
+
+submodels:
+  Course:
+    type: object
+    properties:
+      _id: 
+        type: string
+        format: uuid
+      name:
+        type: string
+      description:
+        type: string
+      history: 
+        type: object
+      gradingStructure: 
+        type: string
+        format: uuid
+      organisation: 
+        type: string
+        format: uuid
+      icon: 
+        type: string
+        format: uuid
+      subject: 
+        type: string
+        format: uuid
+      level: 
+        type: string
+        format: uuid
+      type: 
+        type: string
+        format: uuid
+      labels:
+        type: array
+        items: 
+          type: string
+          format: uuid
+      strands:
+        type: array
+        items: 
+          type: object
+          properties: 
+            id: 
+              type: string
+              format: uuid
+            name: 
+              type: string
+            nuggets:
+              type: array
+              items: 
+                type: string
+                format: uuid
+            weight: 
+              type: number
+      courses:
+        type: array
+        items: 
+          type: string
+          format: uuid
+
+  Class:
+    type: object
+    properties:
+      _id: 
+        type: string
+        format: uuid
+      name:
+        type: string
+      meta:
+        type: string
+      price: 
+        type: number
+      teachers:
+        type: array
+        items: 
+          type: string
+          format: uuid
+      courses:
+        type: array
+        items: 
+          type: string
+          format: uuid
