@@ -3,7 +3,10 @@ import { Handler, APIGatewayEvent } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
 import * as Boom from "boom";
 import * as querystring from "querystring";
+import { Map } from "story-backend-utils";
 import { keyBy } from "lodash";
+import { CENTURY_ORG_ID } from "../config";
+import { getCenturyClasses } from "./get_classes";
 
 import {
   Result,
@@ -19,37 +22,53 @@ const dynamodb = new DynamoDB({
 });
 const Result = Promise;
 
+type ClassResult = {
+  [id: string]: StoryTypes.Class;
+};
 type HandlerResult = {
-  classes: {
-    [id: string]: StoryTypes.Class;
-  };
+  classes: ClassResult;
 };
 
 async function handler(): Result<HandlerResult> {
   // get an admin login token for century
   let token = await getToken();
+  console.log("here I am");
 
   // get all class from dynamo
-  const classes = keyBy(await getStoryClasses(), "_id");
+  const [storyTeachers, centuryTeachers] = await Promise.all([
+    getStoryClasses(),
+    getCenturyClasses(token)
+  ]);
+
+  const classes = Object.keys(storyTeachers).reduce<ClassResult>((map, id) => {
+    if (id in centuryTeachers) {
+      return Object.assign({}, map, {
+        [id]: { ...storyTeachers[id], ...centuryTeachers[id] }
+      });
+    }
+    return map;
+  }, {});
+
   return {
     result: { classes },
     statusCode: 200
   };
 }
 
-async function getStoryClasses(): Promise<StoryTypes.Class[]> {
+async function getStoryClasses(): Promise<Map<StoryTypes.StoryClassFields>> {
   const params = {
     TableName: "story-class"
   };
   const result = await dynamodb.scan(params).promise();
-  if (result.Items === undefined) return [];
-  return result.Items.map(item => ({
-    _id: item._id.S!,
-    price: parseFloat(item.price.N!),
-    meta: item.meta.S!,
-    teachers: item.teachers.SS!,
-    courses: item.courses.SS!
-  }));
+  if (result.Items === undefined) return {};
+  return keyBy(
+    result.Items.map(item => ({
+      _id: item._id.S!,
+      price: parseFloat(item.price.N!),
+      meta: item.meta.S!
+    })),
+    "_id"
+  );
 }
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {

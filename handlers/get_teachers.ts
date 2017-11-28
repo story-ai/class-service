@@ -40,15 +40,20 @@ async function handler(ids: string[]): Result<HandlerResult> {
     getCenturyTeachers(ids, token)
   ]);
 
-  const result: HandlerResult = keyBy(
-    storyTeachers.map(teacher =>
-      Object.assign({}, teacherMap[teacher._id], teacher)
-    ),
-    "_id"
-  );
+  for (let t of storyTeachers) {
+    if (t._id in teacherMap) {
+      teacherMap[t._id] = Object.assign(teacherMap[t._id], t);
+    }
+  }
+  // const result: HandlerResult = keyBy(
+  //   storyTeachers.map(teacher =>
+  //     Object.assign({}, teacherMap[teacher._id], teacher)
+  //   ),
+  //   "_id"
+  // );
   // return something to the client
   return {
-    result,
+    result: teacherMap,
     statusCode: 200
   };
 }
@@ -105,21 +110,4 @@ async function getCenturyTeachers(ids: string[], token: string) {
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = (e.queryStringParameters!["ids"] || "").split(/,\s*/);
   serialiseLambda(done, () => handler(req));
-}
-
-async function promiseMapAll<T>(promiseMap: {
-  [k: string]: Promise<T>;
-}): Promise<{ [k: string]: T }> {
-  try {
-    const promises = await Promise.all(
-      Object.keys(promiseMap).map(k => promiseMap[k])
-    );
-    let objMapped: { [k: string]: T } = {};
-    Object.keys(promiseMap).forEach((key, i) => {
-      objMapped[key] = promises[i];
-    });
-    return objMapped;
-  } catch (err) {
-    return { err };
-  }
 }
