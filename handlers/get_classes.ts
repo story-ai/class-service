@@ -24,7 +24,7 @@ const getWithTokenParams = (token: string) => ({
 });
 
 const dynamodb = new DynamoDB({
-  region: "eu-west-1"
+  region: "eu-west-2"
 });
 const Result = Promise;
 

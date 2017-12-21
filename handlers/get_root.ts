@@ -18,7 +18,7 @@ import {
 import { getToken } from "./auth";
 
 const dynamodb = new DynamoDB({
-  region: "eu-west-1"
+  region: "eu-west-2"
 });
 const Result = Promise;
 
@@ -32,13 +32,13 @@ type HandlerResult = {
 async function handler(): Result<HandlerResult> {
   // get an admin login token for century
   let token = await getToken();
-  console.log("here I am");
 
   // get all class from dynamo
   const [storyTeachers, centuryTeachers] = await Promise.all([
     getStoryClasses(),
     getCenturyClasses(token)
   ]);
+  console.log("Got classes");
 
   const classes = Object.keys(storyTeachers).reduce<ClassResult>((map, id) => {
     if (id in centuryTeachers) {
@@ -59,6 +59,7 @@ async function getStoryClasses(): Promise<Map<StoryTypes.StoryClassFields>> {
   const params = {
     TableName: "story-class"
   };
+  console.log("Going to scan classes")
   const result = await dynamodb.scan(params).promise();
   if (result.Items === undefined) return {};
   return keyBy(

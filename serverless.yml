@@ -5,7 +5,7 @@ provider:
   region: eu-west-2
   runtime: nodejs6.10
   stage: dev
-  profile: serverless
+  profile: story-serverless
 
 plugins:
   - serverless-plugin-typescript  # compile our handlers
@@ -26,7 +26,7 @@ functions:
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: serverless
+      AWS_PROFILE: story-serverless
     events:
       - http:
           path: /
@@ -47,7 +47,7 @@ functions:
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: serverless
+      AWS_PROFILE: story-serverless
     events:
       - http:
           path: /class
@@ -71,7 +71,7 @@ functions:
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: serverless
+      AWS_PROFILE: story-serverless
     events:
       - http:
           path: /teacher
@@ -95,7 +95,7 @@ functions:
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: serverless
+      AWS_PROFILE: story-serverless
     events:
       - http:
           path: /course
@@ -116,6 +116,56 @@ functions:
 
 resources:
   Resources:
+
+    DynamoDBClasses:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: story-class
+        AttributeDefinitions:
+          - AttributeName: _id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: _id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+    DynamoDBTeachers:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: story-teacher
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+    DynamoDBIamPolicy:
+      Type: AWS::IAM::Policy
+      DependsOn: 
+        - DynamoDBTeachers
+        - DynamoDBClasses
+      Properties:
+        PolicyName: lambda-dynamodb
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:GetItem
+                - dynamodb:Scan
+                - dynamodb:BatchGetItem
+                - dynamodb:PutItem
+              Resource: 
+                - arn:aws:dynamodb:*:*:table/story-teacher
+                - arn:aws:dynamodb:*:*:table/story-class
+        Roles:
+          - Ref: IamRoleLambdaExecution
 
     # Name the API something more memorable in API Gateway
     ApiGatewayRestApi:
@@ -162,11 +212,14 @@ resources:
 
 custom:
   customDomain:
-    domainName: api.axontoken.com
-    basePath: material
+    domainName: api.story-ai.com
+    basePath: class
     stage: ${self:provider.stage}
     createRoute53Record: true
 
   documentation: ${file(docs.yml)}
 
-  spec_bucket: story-ai-specs
+  serverless-offline:
+    port: 4000
+
+  spec_bucket: specs.story-ai.com
