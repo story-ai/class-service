@@ -1,7 +1,7 @@
 info:
-  version: "0.1.1"
-  title: Story Class Service
-  description: A simple API for retrieving Story classes
+  version: "0.1.2"
+  title: Story Service
+  description: A simple API for retrieving Story resources
   contact:
     name: Christopher Little
     url: https://story-ai.com
@@ -21,6 +21,74 @@ functions:
           description: Returns the specification
 
 models:
+
+  - name: AddToCourseRequest
+    description: The fields necessary to add a user to a new class
+    contentType: "application/json"
+    schema:
+      type: object
+      properties:
+        courseId:
+          type: string
+          format: string
+        stripeToken:
+          description: Token provided by Stripe's client JS
+          type: string
+          format: string
+      required:
+        - classId
+        - stripeToken
+
+  - name: CreateUserRequest
+    description: "The fields necessary to create a user."
+    contentType: "application/json"
+    schema:
+      type: object
+      properties:
+        email:
+          type: string
+          format: string
+        first_name:
+          type: string
+          format: string
+        last_name:
+          type: string
+          format: string
+      required:
+        - email
+        - first_name
+        - last_name
+
+  - name: CreateUserResponse
+    description: "A minimal representation of a user"
+    contentType: "application/json"
+    schema:
+      type: object
+      properties:
+        _id:
+          type: string
+          format: uuid
+      required:
+        - _id
+
+  - name: APIError
+    description: "Error returned by the API"
+    contentType: "application/json"
+    schema:
+      type: object
+      properties:
+        message:
+          type: string
+          format: string
+        error:
+          type: string
+          format: string
+        statusCode:
+          type: number
+      required:
+        - error
+        - statusCode
+
   - name: RootResponse
     description: A list of class IDs available through Story
     contentType: application/json

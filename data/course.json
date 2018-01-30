@@ -1,0 +1,136 @@
+{
+  "story-course": [
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "0d627068-7114-4a4b-ac5d-3c8a4ae28f31"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "35c04492-91d5-4f6f-9461-3f72a27330b0"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "dae93dda-cfbe-42fa-977b-fbc0f9db357e"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "046afaae-b860-4ad6-ac32-4b131af5835f"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "7549d9cc-8d75-4d67-9ffd-03754d466ee2"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "a72b3756-7da4-4b5a-9756-757614a37ec1"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "78b5dfca-2d07-4c17-a327-3f52bd027eb0"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "4eea5f89-73e1-4480-80f8-4d52e1509334"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "35555db4-3311-4404-8fed-edcb0cab1948"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "8d7c2c15-76ee-41e6-9fde-1f63e972a445"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "d0dcbb52-c409-4480-8a09-62381042672f"
+          },
+          "price": {
+            "N": "12"
+          }
+        }
+      }
+    }
+  ]
+}

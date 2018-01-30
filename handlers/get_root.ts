@@ -59,7 +59,6 @@ async function getStoryClasses(): Promise<Map<StoryTypes.StoryClassFields>> {
   const params = {
     TableName: "story-class"
   };
-  console.log("Going to scan classes")
   const result = await dynamodb.scan(params).promise();
   if (result.Items === undefined) return {};
   return keyBy(

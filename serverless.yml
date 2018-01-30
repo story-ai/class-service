@@ -42,7 +42,7 @@ functions:
                 responseModels:
                   "application/json": RootResponse
 
-  classes:
+  get_classes:
     handler: handlers/get_classes.index
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
@@ -66,7 +66,7 @@ functions:
                 responseModels:
                   "application/json": ClassResponse
 
-  teachers:
+  get_teachers:
     handler: handlers/get_teachers.index
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
@@ -90,8 +90,70 @@ functions:
                 responseModels:
                   "application/json": TeacherResponse
 
-  courses:
-    handler: handlers/get_courses.index
+  get_user_meta:
+    handler: handlers/get_user_meta.index
+    environment:
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      AWS_PROFILE: story-serverless
+    events:
+      - http:
+          path: /user/{id}
+          method: get
+          cors: true
+          documentation:
+            summary: Get user meta-data given an ID
+            tags: 
+              - course
+            parameters:
+              - in: path
+                name: id
+                schema:
+                   type: string
+                required: true
+                description: ID of the user to retrieve
+            methodResponses:
+              - statusCode: "200"
+                description: Returned after the class has been added
+              - statusCode: "500"
+                description: Triggered if something else goes wrong on the server.
+                responseModels:
+                  "application/json": APIError
+
+
+  get_course_meta:
+    handler: handlers/get_course_meta.index
+    environment:
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      AWS_PROFILE: story-serverless
+    events:
+      - http:
+          path: /course/{id}
+          method: get
+          cors: true
+          documentation:
+            summary: Get course meta-data given a course ID
+            tags: 
+              - course
+            parameters:
+              - in: path
+                name: id
+                schema:
+                   type: string
+                required: true
+                description: ID of the course to retrieve
+            methodResponses:
+              - statusCode: "200"
+                description: Returned after the class has been added
+              - statusCode: "500"
+                description: Triggered if something else goes wrong on the server.
+                responseModels:
+                  "application/json": APIError
+
+  get_courses:
+    handler: handlers/get_all_course_meta.index
+    # handler: handlers/get_courses.index
     environment:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
@@ -111,11 +173,111 @@ functions:
             methodResponses:
               - statusCode: "200"
                 description: Courses were fetched successfully
+
+  addToClass:
+    handler: handlers/add_course_to_class.index
+    environment:
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      STRIPE_SECRET_KEY: ${file(keys.yml):STRIPE_SECRET_KEY}
+      CENTURY_ORG_ID: 0adee573-b3e3-46cf-a16b-32980590e2fe
+      AWS_PROFILE: story-serverless
+    events:
+      - http:
+          path: /user/{userId}/class
+          method: put
+          cors: true
+          documentation:
+            summary: Add a course to a given user's class
+            tags: 
+              - user
+            parameters:
+              - in: path
+                name: userId
+                schema:
+                   type: string
+                required: true
+                description: ID of the user we are adding to the class
+            requestBody:
+              description: JSON body containing details of the class to add
+            requestModels:
+                "application/json": AddToCourseRequest
+            methodResponses:
+              - statusCode: "200"
+                description: Returned after the course has been added to the class
+              - statusCode: "500"
+                description: Triggered if something else goes wrong on the server.
                 responseModels:
-                  "application/json": CourseResponse
+                  "application/json": APIError
+
+  createUser:
+    handler: handlers/createUser.index
+    environment:
+      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+      AWS_PROFILE: story-serverless
+    events:
+      - http:
+          path: /user
+          method: post
+          cors: true
+          documentation:
+            summary: "Create a new Story user"
+            tags: 
+              - user
+            requestBody:
+              description: "JSON body containing the new user's name and email address."
+            requestModels:
+                "application/json": "CreateUserRequest"
+            methodResponses:
+              - statusCode: "200"
+                description: "Returned after the user has successfully been created"
+                responseModels:
+                  "application/json": "CreateUserResponse"
+              - statusCode: "409"
+                description: "Triggered when the email address has already been used to register for CENTURY."
+                responseModels:
+                  "application/json": "APIError"
+              - statusCode: "422"
+                description: "Triggered if any user fields fail validation."
+                responseModels:
+                  "application/json": "APIError"
+              - statusCode: "500"
+                description: "Triggered if something else goes wrong on the server."
+                responseModels:
+                  "application/json": "APIError"
+
 
 resources:
   Resources:
+
+    DynamoDBUsers:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: story-user
+        AttributeDefinitions:
+          - AttributeName: _id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: _id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
+    DynamoDBCourses:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: story-course
+        AttributeDefinitions:
+          - AttributeName: _id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: _id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
 
     DynamoDBClasses:
       Type: AWS::DynamoDB::Table
@@ -164,6 +326,8 @@ resources:
               Resource: 
                 - arn:aws:dynamodb:*:*:table/story-teacher
                 - arn:aws:dynamodb:*:*:table/story-class
+                - arn:aws:dynamodb:*:*:table/story-user
+                - arn:aws:dynamodb:*:*:table/story-course
         Roles:
           - Ref: IamRoleLambdaExecution
 

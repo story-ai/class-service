@@ -4,10 +4,11 @@ import { DynamoDB } from "aws-sdk";
 import * as Boom from "boom";
 import * as querystring from "querystring";
 import { keyBy } from "lodash";
-import { Id, Map } from "story-backend-utils";
 import { CENTURY_ORG_ID } from "../config";
 
 import {
+  Id,
+  Map,
   Result,
   serialiseLambda,
   CenturyTypes,
@@ -102,34 +103,64 @@ export async function getCenturyClasses(
   );
 
   let classes = await result.json<CenturyTypes.UnjoinedClass[]>();
-  let classIds: string[];
   if (ids !== undefined) {
     classes = classes.filter(t => ids.indexOf(t._id) >= 0);
   }
 
+  console.log("Got classes ", classes);
+
   // also want to retrieve teachers and courses for this class
-  const joined = await Promise.all(classes.map(c =>
-    Promise.all([
-      fetch(
-        `https://api.century.tech/accounts/v2/users?${querystring.stringify({
-          org: CENTURY_ORG_ID,
-          role: "teacher",
-          class: c._id
-        })}`,
-        getWithTokenParams(token)
-      ).then(r => r.json<{ _id: Id }[]>()),
-      fetch(
-        `https://app.century.tech/teach/api/learners/courses?classId=${c._id}`,
-        getWithTokenParams(token)
-      ).then(r => r.json<{ _id: Id }[]>())
-    ]).then(([teachers, courses]) => {
-      return {
-        ...c,
-        teachers: teachers.map(x => x._id),
-        courses: courses.map(x => x._id)
-      };
-    })
-  ));
+  const joined = await Promise.all(
+    classes.map(c =>
+      Promise.all([
+        fetch(
+          `https://api.century.tech/accounts/v2/users?${querystring.stringify({
+            org: CENTURY_ORG_ID,
+            role: "teacher",
+            class: c._id
+          })}`,
+          getWithTokenParams(token)
+        ).then(
+          r =>
+            console.log("Teachers: ", r.statusText) || r.json<{ _id: Id }[]>()
+        ),
+
+        fetch(
+          `https://api.century.tech/accounts/v2/study-groups?include=course&class=${
+            c._id
+          }`,
+          getWithTokenParams(token)
+        ).then(async r => {
+          // const text = await r.text();
+          // try {
+          //   const json = JSON.parse(text);
+          //   console.log(
+          //     "Failed on ",
+          //     `https://app.century.tech/teach/api/learners/courses?classId=${
+          //       c._id
+          //     }`
+          //   );
+
+          // } catch (e) {
+          //   console.log(
+          //     "Failed on ",
+          //     `https://app.century.tech/teach/api/learners/courses?classId=${
+          //       c._id
+          //     }`
+          //   );
+          // }
+          console.log("Courses: ", r.statusText);
+          return r.json<{ course: Id }[]>();
+        })
+      ]).then(([teachers, courses]) => {
+        return {
+          ...c,
+          teachers: teachers.map(x => x._id),
+          courses: courses.map(x => x.course)
+        };
+      })
+    )
+  );
 
   return keyBy(joined, "_id");
 }

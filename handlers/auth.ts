@@ -17,6 +17,7 @@ export const fetchToken: () => Promise<string> = () => {
   })
     .then(response => response.json())
     .then(json => {
+      // console.log(json)
       const decoded = jwt_decode<{ exp: number }>(json.token);
       token = json.token;
       expiry = new Date(1000 * decoded.exp);
