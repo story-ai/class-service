@@ -7,6 +7,7 @@ import {
   CenturyTypes,
   StoryTypes
 } from "story-backend-utils";
+import { TABLES } from "../config";
 
 const dynamodb = new DynamoDB({
   region: "eu-west-2"
@@ -17,7 +18,7 @@ export async function getCourseMeta(
 ): Promise<StoryTypes.StoryCourseFields> {
   const result = await dynamodb
     .getItem({
-      TableName: "story-course",
+      TableName: TABLES.course,
       Key: {
         _id: {
           S: courseID

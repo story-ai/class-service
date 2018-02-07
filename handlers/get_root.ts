@@ -5,7 +5,7 @@ import * as Boom from "boom";
 import * as querystring from "querystring";
 import { Map } from "story-backend-utils";
 import { keyBy } from "lodash";
-import { CENTURY_ORG_ID } from "../config";
+import { CENTURY_ORG_ID, TABLES } from "../config";
 import { getCenturyClasses } from "./get_classes";
 
 import {
@@ -57,7 +57,7 @@ async function handler(): Result<HandlerResult> {
 
 async function getStoryClasses(): Promise<Map<StoryTypes.StoryClassFields>> {
   const params = {
-    TableName: "story-class"
+    TableName: TABLES.class
   };
   const result = await dynamodb.scan(params).promise();
   if (result.Items === undefined) return {};

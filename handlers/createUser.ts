@@ -75,6 +75,7 @@ async function simpleHandler(
       {
         password,
         personal: { name: { first: "Story", last: "User" } },
+        isTest: true,
 
         contact: {
           emails: [

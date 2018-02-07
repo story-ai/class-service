@@ -9,6 +9,7 @@ import {
 } from "story-backend-utils";
 import { AttributeMap } from "aws-sdk/clients/dynamodbstreams";
 import { keyBy } from "lodash";
+import { TABLES } from "../config";
 
 const dynamodb = new DynamoDB({
   region: "eu-west-2"
@@ -23,7 +24,7 @@ export async function getCourseMetas(
     const response = await dynamodb
       .batchGetItem({
         RequestItems: {
-          "story-course": {
+          [TABLES.course]: {
             Keys: ids.map(id => ({
               _id: {
                 S: id
@@ -36,15 +37,15 @@ export async function getCourseMetas(
 
     if (
       response.Responses === undefined ||
-      response.Responses["story-course"] === undefined
+      response.Responses[TABLES.course] === undefined
     )
       return {};
 
-    result = response.Responses["story-course"];
+    result = response.Responses[TABLES.course];
   } else {
     const { Items: items } = await dynamodb
       .scan({
-        TableName: "story-course"
+        TableName: TABLES.course
       })
       .promise();
     result = items!;
@@ -60,7 +61,7 @@ export async function getCourseMetas(
 }
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
-  let result;
+  let result: Promise<{ [k: string]: StoryTypes.StoryCourseFields }>;
   if (e.queryStringParameters && e.queryStringParameters.ids) {
     result = getCourseMetas(e.queryStringParameters.ids.split(","));
   } else {

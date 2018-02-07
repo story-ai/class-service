@@ -12,3 +12,12 @@ export const CENTURY_ADMIN_PASSWORD = process.env.CENTURY_ADMIN_PASSWORD || "";
 
 export const CENTURY_ORG_ID =
   process.env.CENTURY_ORG_ID || "0adee573-b3e3-46cf-a16b-32980590e2fe";
+
+const stage = process.env.STAGE;
+
+export const TABLES = {
+  user: `${stage}-story-user`,
+  teacher: `${stage}-story-teacher`,
+  course: `${stage}-story-course`,
+  class: `${stage}-story-class`
+};

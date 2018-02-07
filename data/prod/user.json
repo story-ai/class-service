@@ -1,5 +1,5 @@
 {
-  "story-class": [
+  "prod-story-user": [
     {
       "PutRequest": {
         "Item": {

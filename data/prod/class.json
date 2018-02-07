@@ -1,0 +1,89 @@
+{
+  "prod-story-class": [
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "9a74441c-aaf5-4ff2-b596-ec485f509b32"
+          },
+          "courses": {
+            "SS": [
+              "0d627068-7114-4a4b-ac5d-3c8a4ae28f31",
+              "35c04492-91d5-4f6f-9461-3f72a27330b0",
+              "dae93dda-cfbe-42fa-977b-fbc0f9db357e"
+            ]
+          },
+          "meta": {
+            "S": "The Demo Class"
+          },
+          "price": {
+            "N": "12"
+          },
+          "teachers": {
+            "SS": [
+              "4bf9743f-0447-43e6-92b5-45964c1115f4",
+              "90f2a495-2270-46da-b4a9-d872f76898a5"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "f57137b2-5c25-45ec-ba39-92def01ca5e5"
+          },
+          "courses": {
+            "SS": ["8d7c2c15-76ee-41e6-9fde-1f63e972a445"]
+          },
+          "meta": {
+            "S": "English"
+          },
+          "price": {
+            "N": "5"
+          },
+          "teachers": {
+            "SS": [
+              "4bf9743f-0447-43e6-92b5-45964c1115f4",
+              "a66368c9-c6a1-4c5f-89ed-5ce5099b1008"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "7c8a5e28-623e-437d-b94c-bd6035f5a5f5"
+          },
+          "courses": {
+            "SS": [
+              "046afaae-b860-4ad6-ac32-4b131af5835f",
+              "35555db4-3311-4404-8fed-edcb0cab1948",
+              "4eea5f89-73e1-4480-80f8-4d52e1509334",
+              "7549d9cc-8d75-4d67-9ffd-03754d466ee2",
+              "78b5dfca-2d07-4c17-a327-3f52bd027eb0",
+              "a72b3756-7da4-4b5a-9756-757614a37ec1",
+              "d0dcbb52-c409-4480-8a09-62381042672f"
+            ]
+          },
+          "meta": {
+            "S": "David's"
+          },
+          "price": {
+            "N": "9.99"
+          },
+          "teachers": {
+            "SS": [
+              "38b10e86-ffc8-4c58-a099-20aef20aef29",
+              "3f6cb888-90d3-4f43-916a-eff9cf100059",
+              "6504e6e2-9d88-4643-8b6e-b0d7ecfdd65f"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

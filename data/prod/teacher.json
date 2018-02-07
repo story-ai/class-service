@@ -1,9 +1,9 @@
 {
-  "story-teacher": [
+  "prod-story-teacher": [
     {
       "PutRequest": {
         "Item": {
-          "id": {
+          "_id": {
             "S": "4bf9743f-0447-43e6-92b5-45964c1115f4"
           },
           "meta": {
@@ -15,7 +15,7 @@
     {
       "PutRequest": {
         "Item": {
-          "id": {
+          "_id": {
             "S": "3f6cb888-90d3-4f43-916a-eff9cf100059"
           },
           "meta": {
@@ -27,7 +27,7 @@
     {
       "PutRequest": {
         "Item": {
-          "id": {
+          "_id": {
             "S": "38b10e86-ffc8-4c58-a099-20aef20aef29"
           },
           "meta": {
@@ -39,7 +39,7 @@
     {
       "PutRequest": {
         "Item": {
-          "id": {
+          "_id": {
             "S": "a66368c9-c6a1-4c5f-89ed-5ce5099b1008"
           },
           "meta": {
@@ -51,7 +51,7 @@
     {
       "PutRequest": {
         "Item": {
-          "id": {
+          "_id": {
             "S": "90f2a495-2270-46da-b4a9-d872f76898a5"
           },
           "meta": {

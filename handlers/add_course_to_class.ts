@@ -1,39 +1,27 @@
-import { fetchToken } from "./auth";
-import fetch from "node-fetch";
-import { Handler, APIGatewayEvent } from "aws-lambda";
-import axios, { AxiosPromise } from "axios";
-import * as Stripe from "stripe";
+import { APIGatewayEvent } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
-import {
-  CENTURY_ORG_ID,
-  CLASS_CODE,
-  SENDGRID_API_KEY,
-  STRIPE_SECRET_KEY
-} from "../config";
-import {
-  Map,
-  StoryTypes,
-  Result,
-  serialiseLambda,
-  CenturyTypes
-} from "story-backend-utils";
+import axios, { AxiosPromise } from "axios";
+import { serialiseLambda } from "story-backend-utils";
+import * as Stripe from "stripe";
+
+import { CENTURY_ORG_ID, STRIPE_SECRET_KEY } from "../config";
+import { getToken } from "./auth";
+import { fetchToken } from "./auth";
 import { getCourseMeta } from "./get_course_meta";
+import { getCourse } from "./get_courses";
 import { getUserMeta } from "./get_user_meta";
+import { Result } from "story-backend-utils/dist/types/common";
+const Result = Promise;
 
 console.log(STRIPE_SECRET_KEY);
 const stripe = new Stripe(STRIPE_SECRET_KEY);
-const dynamodb = new DynamoDB({
-  region: "eu-west-2"
-});
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = JSON.parse(e.body || "{}");
   serialiseLambda(done, () =>
-    simpleHandler(e.pathParameters!.userId, req.courseId, req.stripeToken)
+    simpleHandler(e.pathParameters!.id, req.courseId, req.stripeToken)
   );
 }
-
-const Result = Promise;
 
 async function simpleHandler(
   userId: string,
@@ -47,14 +35,20 @@ async function simpleHandler(
     if (stripeToken === undefined || stripeToken.length < 1)
       throw "Stripe token is invalid";
 
+    // get an admin login token for century
+    let token = await getToken();
+
     // Firstly, retrieve the course details so we know how much to charge
-    const courseMeta = await getCourseMeta(courseId);
+    const [courseMeta, courseDetails] = await Promise.all([
+      getCourseMeta(courseId),
+      getCourse(courseId, token)
+    ]);
 
     // Charge the user's card:
     const charge = await stripe.charges.create({
       amount: courseMeta.price * 100,
       currency: "USD",
-      description: "Story Course", // TODO: retrieve this (from century)?
+      description: "Story Course: " + courseDetails.name,
       source: stripeToken
     });
 
@@ -62,7 +56,7 @@ async function simpleHandler(
     const userMeta = await getUserMeta(userId);
 
     // now that's done, we can actually add the course to the user's class
-    await assignCourse(userMeta._id, courseId);
+    await assignCourse(userMeta.class, courseId, courseDetails.name);
     return { result: { success: true }, statusCode: 200 };
   } catch (e) {
     console.log("ERROR");
@@ -74,7 +68,11 @@ async function simpleHandler(
   }
 }
 
-async function assignCourse(classId: string, courseId: string): Promise<any> {
+async function assignCourse(
+  classId: string,
+  courseId: string,
+  courseName: string
+): Promise<any> {
   const token = await fetchToken();
   type Job = {
     contentResponse: null;
@@ -92,7 +90,8 @@ async function assignCourse(classId: string, courseId: string): Promise<any> {
     axios.post<Job>(
       "https://api.century.tech/palpatine/api/v1/studygroups/create-update",
       {
-        name: "No Name Given", // TODO: name this better
+        name: courseName + " Study Group",
+        isTest: true,
         classId,
         courseId,
         organisationId: CENTURY_ORG_ID
@@ -113,7 +112,8 @@ async function assignCourse(classId: string, courseId: string): Promise<any> {
         return job;
       } else if (job.status === "waiting" || job.status === "running") {
         // delay before checking status
-        await new Promise(r => setTimeout(r, 200));
+        console.log("Will retry shortly");
+        await new Promise(r => setTimeout(r, 100));
         // check status of the job
         return waitForJob(
           axios.get<Job>(
@@ -134,6 +134,6 @@ async function assignCourse(classId: string, courseId: string): Promise<any> {
     console.error("Something went wrong");
     console.log("Status ", status);
     console.log(job);
-    return Promise.reject(job);
+    return Promise.reject(job.error);
   }
 }

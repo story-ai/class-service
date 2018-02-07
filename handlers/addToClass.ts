@@ -8,7 +8,8 @@ import {
   CENTURY_ORG_ID,
   CLASS_CODE,
   SENDGRID_API_KEY,
-  STRIPE_SECRET_KEY
+  STRIPE_SECRET_KEY,
+  TABLES
 } from "../config";
 import {
   Map,
@@ -127,7 +128,7 @@ async function getStoryClass(
   const result = await dynamodb
     .getItem({
       Key: { _id: { S: id } },
-      TableName: "story-class"
+      TableName: TABLES.class
     })
     .promise();
 
@@ -135,7 +136,6 @@ async function getStoryClass(
 
   return {
     _id: result.Item._id.S!,
-    price: parseFloat(result.Item.price.N!),
-    meta: result.Item.meta.S!
+    price: parseFloat(result.Item.price.N!)
   };
 }

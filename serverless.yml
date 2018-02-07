@@ -4,7 +4,7 @@ provider:
   name: aws
   region: eu-west-2
   runtime: nodejs6.10
-  stage: dev
+  stage: ${opt:stage,'dev'}
   profile: story-serverless
 
 plugins:
@@ -24,6 +24,7 @@ functions:
   root:
     handler: handlers/get_root.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       AWS_PROFILE: story-serverless
@@ -45,6 +46,7 @@ functions:
   get_classes:
     handler: handlers/get_classes.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       AWS_PROFILE: story-serverless
@@ -69,6 +71,7 @@ functions:
   get_teachers:
     handler: handlers/get_teachers.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       AWS_PROFILE: story-serverless
@@ -93,6 +96,7 @@ functions:
   get_user_meta:
     handler: handlers/get_user_meta.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       AWS_PROFILE: story-serverless
@@ -124,6 +128,7 @@ functions:
   get_course_meta:
     handler: handlers/get_course_meta.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       AWS_PROFILE: story-serverless
@@ -155,6 +160,7 @@ functions:
     handler: handlers/get_all_course_meta.index
     # handler: handlers/get_courses.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       AWS_PROFILE: story-serverless
@@ -177,14 +183,15 @@ functions:
   addToClass:
     handler: handlers/add_course_to_class.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      STRIPE_SECRET_KEY: ${file(keys.yml):STRIPE_SECRET_KEY}
+      STRIPE_SECRET_KEY: ${file(keys.yml):STRIPE_SECRET_KEY.${self:provider.stage}}
       CENTURY_ORG_ID: 0adee573-b3e3-46cf-a16b-32980590e2fe
       AWS_PROFILE: story-serverless
     events:
       - http:
-          path: /user/{userId}/class
+          path: /user/{id}/course
           method: put
           cors: true
           documentation:
@@ -193,7 +200,7 @@ functions:
               - user
             parameters:
               - in: path
-                name: userId
+                name: id
                 schema:
                    type: string
                 required: true
@@ -213,6 +220,7 @@ functions:
   createUser:
     handler: handlers/createUser.index
     environment:
+      STAGE: ${self:provider.stage}
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       AWS_PROFILE: story-serverless
@@ -254,7 +262,7 @@ resources:
     DynamoDBUsers:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: story-user
+        TableName: ${self:provider.stage}-story-user
         AttributeDefinitions:
           - AttributeName: _id
             AttributeType: S
@@ -268,7 +276,7 @@ resources:
     DynamoDBCourses:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: story-course
+        TableName: ${self:provider.stage}-story-course
         AttributeDefinitions:
           - AttributeName: _id
             AttributeType: S
@@ -282,7 +290,7 @@ resources:
     DynamoDBClasses:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: story-class
+        TableName: ${self:provider.stage}-story-class
         AttributeDefinitions:
           - AttributeName: _id
             AttributeType: S
@@ -296,12 +304,12 @@ resources:
     DynamoDBTeachers:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: story-teacher
+        TableName: ${self:provider.stage}-story-teacher
         AttributeDefinitions:
-          - AttributeName: id
+          - AttributeName: _id
             AttributeType: S
         KeySchema:
-          - AttributeName: id
+          - AttributeName: _id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 5
@@ -312,8 +320,10 @@ resources:
       DependsOn: 
         - DynamoDBTeachers
         - DynamoDBClasses
+        - DynamoDBCourses
+        - DynamoDBUsers
       Properties:
-        PolicyName: lambda-dynamodb
+        PolicyName: ${self:provider.stage}-lambda-dynamodb
         PolicyDocument:
           Version: '2012-10-17'
           Statement:
@@ -324,10 +334,10 @@ resources:
                 - dynamodb:BatchGetItem
                 - dynamodb:PutItem
               Resource: 
-                - arn:aws:dynamodb:*:*:table/story-teacher
-                - arn:aws:dynamodb:*:*:table/story-class
-                - arn:aws:dynamodb:*:*:table/story-user
-                - arn:aws:dynamodb:*:*:table/story-course
+                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-teacher
+                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-class
+                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-user
+                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-course
         Roles:
           - Ref: IamRoleLambdaExecution
 
@@ -335,7 +345,7 @@ resources:
     ApiGatewayRestApi:
       Type: AWS::ApiGateway::RestApi
       Properties:
-        Name: Class Service
+        Name: Class Service (${self:provider.stage})
 
     # Add a proxy resource in API Gateway to represent the API spec
     # TODO: Move this into serverless-spec-uploader
@@ -368,15 +378,18 @@ resources:
         Integration:
           IntegrationHttpMethod: GET
           Type: HTTP
-          Uri: https://s3.eu-west-2.amazonaws.com/${self:custom.spec_bucket}/${self:service}.json
+          Uri: https://s3.eu-west-2.amazonaws.com/${self:custom.spec_bucket}/${self:service}-${self:provider.stage}.json
           IntegrationResponses:
             - StatusCode: "200"
               ResponseParameters:
                 method.response.header.Access-Control-Allow-Origin : "'*'"
 
 custom:
+  domains:
+    prod: api.story-ai.com
+    dev: api.staging.story-ai.com
   customDomain:
-    domainName: api.story-ai.com
+    domainName: ${self:custom.domains.${self:provider.stage}}
     basePath: class
     stage: ${self:provider.stage}
     createRoute53Record: true

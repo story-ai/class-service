@@ -1,5 +1,5 @@
 {
-  "story-course": [
+  "prod-story-course": [
     {
       "PutRequest": {
         "Item": {

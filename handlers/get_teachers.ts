@@ -80,7 +80,7 @@ async function getStoryTeachers(
   )
     return [];
   return result.Responses["story-teacher"].map(item => ({
-    _id: item.id.S!,
+    _id: item._id.S!,
     meta: item.meta.S!
   }));
 }

@@ -4,7 +4,7 @@ import { DynamoDB } from "aws-sdk";
 import * as Boom from "boom";
 import * as querystring from "querystring";
 import { keyBy } from "lodash";
-import { CENTURY_ORG_ID } from "../config";
+import { CENTURY_ORG_ID, TABLES } from "../config";
 
 import {
   Id,
@@ -62,7 +62,7 @@ async function getStoryClassesById(
 ): Promise<Map<StoryTypes.StoryClassFields>> {
   const params = {
     RequestItems: {
-      "story-class": {
+      [TABLES.class]: {
         Keys: ids.map(id => ({
           _id: {
             S: id
@@ -74,12 +74,12 @@ async function getStoryClassesById(
   const result = await dynamodb.batchGetItem(params).promise();
   if (
     result.Responses === undefined ||
-    result.Responses["story-class"] === undefined
+    result.Responses[TABLES.class] === undefined
   )
     return {};
 
   return keyBy(
-    result.Responses["story-class"].map(item => ({
+    result.Responses[TABLES.class].map(item => ({
       _id: item._id.S!,
       price: parseFloat(item.price.N!),
       meta: item.meta.S!

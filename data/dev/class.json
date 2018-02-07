@@ -1,5 +1,5 @@
 {
-  "story-class": [
+  "dev-story-class": [
     {
       "PutRequest": {
         "Item": {

@@ -50,7 +50,7 @@ async function handler(courseIDs: string[]): Result<HandlerResult> {
   };
 }
 
-function getCourse(
+export function getCourse(
   courseId: string,
   token: string
 ): Promise<CenturyTypes.Course> {
