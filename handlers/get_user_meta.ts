@@ -37,23 +37,6 @@ export async function getUserMeta(
   }
   const token = await fetchToken();
 
-  // create a new class in Century
-  const { data: { id: classId } } = await axios.post<{ id: string }>(
-    "https://api.century.tech/accounts/v2/classes",
-    {
-      name: "Story Class", // TODO: Get the user's name
-      organisation: CENTURY_ORG_ID,
-      type: "custom"
-    },
-    {
-      headers: {
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json"
-      }
-    }
-  );
-  console.log("Created a new class with ID ", classId);
-
   // get the user object we are going to modify
   let { data: userResult } = await axios.get<CenturyTypes.User>(
     `https://api.century.tech/accounts/v2/users/${userId}`,
@@ -64,6 +47,24 @@ export async function getUserMeta(
       }
     }
   );
+
+  // create a new class in Century
+  const { data: { id: classId } } = await axios.post<{ id: string }>(
+    "https://api.century.tech/accounts/v2/classes",
+    {
+      name: `${userResult.personal.name.first}'s Story Class`,
+      organisation: CENTURY_ORG_ID,
+      type: "custom",
+      isTest: true
+    },
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json"
+      }
+    }
+  );
+  console.log("Created a new class with ID ", classId);
 
   // add the student to this new class
   const user: CenturyTypes.User = {

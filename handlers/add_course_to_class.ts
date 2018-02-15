@@ -47,7 +47,7 @@ async function simpleHandler(
     // Charge the user's card:
     const charge = await stripe.charges.create({
       amount: courseMeta.price * 100,
-      currency: "USD",
+      currency: "GBP",
       description: "Story Course: " + courseDetails.name,
       source: stripeToken
     });
@@ -77,23 +77,24 @@ async function assignCourse(
   type Job = {
     contentResponse: null;
     contextIds: string[];
-    endTime: string;
-    error: string;
+    endTime: string | null;
+    error: string | null;
     jobId: string;
     name: string;
     scheduledTime: string;
-    startTime: string;
+    startTime: string | null;
     status: "waiting" | "success" | "running";
   };
 
   return waitForJob(
     axios.post<Job>(
-      "https://api.century.tech/palpatine/api/v1/studygroups/create-update",
+      "https://api.century.tech/palpatine/api/v1/studygroups",
       {
         name: courseName + " Study Group",
         isTest: true,
         classId,
         courseId,
+        filter: { classes: [classId] },
         organisationId: CENTURY_ORG_ID
       },
       {
