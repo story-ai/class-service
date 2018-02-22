@@ -21,3 +21,5 @@ export const TABLES = {
   course: `${stage}-story-course`,
   class: `${stage}-story-class`
 };
+
+export const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;

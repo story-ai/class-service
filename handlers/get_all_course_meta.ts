@@ -19,7 +19,6 @@ export async function getCourseMetas(
   ids?: string[]
 ): Promise<{ [k: string]: StoryTypes.StoryCourseFields }> {
   let result: AttributeMap[];
-  console.log("IDS: ", ids);
   if (ids) {
     const response = await dynamodb
       .batchGetItem({

@@ -11,12 +11,20 @@ const Result = Promise;
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = JSON.parse(e.body || "{}");
   serialiseLambda(done, () =>
-    simpleHandler(req.username, req.password, req.passwordConfirmation)
+    simpleHandler(
+      req.username,
+      req.firstname,
+      req.lastname,
+      req.password,
+      req.passwordConfirmation
+    )
   );
 }
 
 async function simpleHandler(
   username: string,
+  firstname: string,
+  lastname: string,
   password: string,
   passwordConfirmation: string
 ): Result<{ success: boolean; message?: string }> {
@@ -47,6 +55,10 @@ async function simpleHandler(
         statusCode: 400
       };
     }
+    if (firstname === undefined) {
+      firstname = "Story";
+      lastname = "User;";
+    }
 
     // check if the user has already registered with Century
     let check = await axios.get<{ isKnownUser: boolean }>(
@@ -74,7 +86,7 @@ async function simpleHandler(
       "https://api.century.tech/accounts/v2/users/",
       {
         password,
-        personal: { name: { first: "Story", last: "User" } },
+        personal: { name: { first: firstname, last: lastname } },
         isTest: true,
 
         contact: {
@@ -104,6 +116,17 @@ async function simpleHandler(
         }
       }
     );
+    // TODO: update mailchimp. POST to us17.api.mailchimp.com/3.0/lists/{list_id}/members/
+    /*
+{
+    email_address: username,
+    "status": "subscribed",
+    "merge_fields": {
+        "FNAME": firstname,
+        "LNAME": lastname
+    }
+}
+*/
 
     console.log(register);
     return { result: { success: true }, statusCode: 200 };

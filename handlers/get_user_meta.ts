@@ -10,20 +10,18 @@ import {
 } from "story-backend-utils";
 import { CENTURY_ORG_ID, TABLES } from "../config";
 
-const dynamodb = new DynamoDB({
+var docClient = new DynamoDB.DocumentClient({
   region: "eu-west-2"
 });
 
 export async function getUserMeta(
   userId: string
 ): Promise<StoryTypes.StoryUserFields> {
-  const result = await dynamodb
-    .getItem({
+  const result = await docClient
+    .get({
       TableName: TABLES.user,
       Key: {
-        _id: {
-          S: userId
-        }
+        _id: userId
       }
     })
     .promise();
@@ -31,8 +29,9 @@ export async function getUserMeta(
   if (result.Item !== undefined) {
     console.log("Re-used existing class");
     return {
-      _id: result.Item._id.S!,
-      class: result.Item.class.S!
+      _id: result.Item._id,
+      class: result.Item.class,
+      discounts: result.Item.discounts || []
     };
   }
   const token = await fetchToken();
@@ -99,27 +98,29 @@ export async function getUserMeta(
     });
 
   // persist this new class to the meta info in Story DB
-  const dynamoUpdate = dynamodb
-    .putItem({
-      TableName: TABLES.user,
-      Item: {
-        _id: {
-          S: userId
-        },
-        class: {
-          S: classId
-        }
+  const newItem = {
+    _id: userId,
+    class: classId,
+    discounts: [
+      {
+        _id: "discount_" + Math.floor(Math.random() * 1000000),
+        name: "Introductory Discount",
+        value: 5
       }
+    ]
+  };
+
+  const dynamoUpdate = docClient
+    .put({
+      TableName: TABLES.user,
+      Item: newItem
     })
     .promise();
 
   // wait for things to settle
   await Promise.all([dynamoUpdate, centuryUpdate]);
 
-  return {
-    _id: userId,
-    class: classId
-  };
+  return newItem;
 }
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {

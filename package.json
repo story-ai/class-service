@@ -5,20 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "_dynamo":
-      "aws dynamodb --profile story-serverless --region eu-west-2 batch-write-item --request-items ",
+    "_dynamo": "aws dynamodb --profile story-serverless --region eu-west-2 batch-write-item --request-items ",
     "prod-data-class": "npm run _dynamo -- file://data/prod/class.json",
     "prod-data-user": "npm run _dynamo -- file://data/prod/user.json",
     "prod-data-teacher": "npm run _dynamo -- file://data/prod/teacher.json",
     "prod-data-course": "npm run _dynamo -- file://data/prod/course.json",
-    "prod-data":
-      "npm run prod-data-class && npm run prod-data-teacher && npm run prod-data-user && npm run prod-data-course",
+    "prod-data": "npm run prod-data-class && npm run prod-data-teacher && npm run prod-data-user && npm run prod-data-course",
     "dev-data-class": "npm run _dynamo -- file://data/dev/class.json",
     "dev-data-user": "npm run _dynamo -- file://data/dev/user.json",
     "dev-data-teacher": "npm run _dynamo -- file://data/dev/teacher.json",
     "dev-data-course": "npm run _dynamo -- file://data/dev/course.json",
-    "dev-data":
-      "npm run dev-data-class && npm run dev-data-teacher && npm run dev-data-user && npm run dev-data-course"
+    "dev-data": "npm run dev-data-class && npm run dev-data-teacher && npm run dev-data-user && npm run dev-data-course"
   },
   "engines": {
     "node": ">=6.10.3"
@@ -37,7 +34,7 @@
     "node-fetch": "^1.7.3",
     "randomatic": "^2.0.0",
     "serverless-spec-uploader": "^0.2.0",
-    "story-backend-utils": "^0.1.8",
+    "story-backend-utils": "^0.1.9",
     "stripe": "^5.4.0"
   },
   "devDependencies": {

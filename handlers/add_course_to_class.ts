@@ -1,59 +1,103 @@
 import { APIGatewayEvent } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
 import axios, { AxiosPromise } from "axios";
-import { serialiseLambda } from "story-backend-utils";
+import { serialiseLambda, StoryTypes } from "story-backend-utils";
 import * as Stripe from "stripe";
 
-import { CENTURY_ORG_ID, STRIPE_SECRET_KEY } from "../config";
-import { getToken } from "./auth";
-import { fetchToken } from "./auth";
+import { CENTURY_ORG_ID, STRIPE_SECRET_KEY, TABLES } from "../config";
+import { fetchToken, getToken } from "./auth";
 import { getCourseMeta } from "./get_course_meta";
 import { getCourse } from "./get_courses";
 import { getUserMeta } from "./get_user_meta";
-import { Result } from "story-backend-utils/dist/types/common";
+import { Result } from "story-backend-utils";
 const Result = Promise;
 
-console.log(STRIPE_SECRET_KEY);
+var docClient = new DynamoDB.DocumentClient({
+  region: "eu-west-2"
+});
+
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = JSON.parse(e.body || "{}");
   serialiseLambda(done, () =>
-    simpleHandler(e.pathParameters!.id, req.courseId, req.stripeToken)
+    simpleHandler(
+      e.pathParameters!.id,
+      req.courseId,
+      req.stripeToken,
+      req.discount
+    )
   );
 }
 
 async function simpleHandler(
   userId: string,
   courseId: string,
-  stripeToken: string
+  stripeToken?: string,
+  discount?: Partial<StoryTypes.Discount>
 ): Result<{ success: boolean; message?: string }> {
   try {
-    if (userId === undefined || userId.length < 1) throw "User ID invalid";
+    if (userId === undefined || userId.length < 1)
+      throw new Error("User ID invalid");
     if (courseId === undefined || courseId.length < 1)
-      throw "Course ID invalid";
-    if (stripeToken === undefined || stripeToken.length < 1)
-      throw "Stripe token is invalid";
+      throw new Error("Course ID invalid");
 
     // get an admin login token for century
     let token = await getToken();
 
     // Firstly, retrieve the course details so we know how much to charge
-    const [courseMeta, courseDetails] = await Promise.all([
+    const [courseMeta, courseDetails, userMeta] = await Promise.all([
       getCourseMeta(courseId),
-      getCourse(courseId, token)
+      getCourse(courseId, token),
+      getUserMeta(userId)
     ]);
 
-    // Charge the user's card:
-    const charge = await stripe.charges.create({
-      amount: courseMeta.price * 100,
-      currency: "GBP",
-      description: "Story Course: " + courseDetails.name,
-      source: stripeToken
-    });
+    let validDiscount: StoryTypes.Discount | undefined;
 
-    // Get the user's class
-    const userMeta = await getUserMeta(userId);
+    if (discount !== undefined) {
+      // TODO: validate that this user is allowed this discount
+      console.log("My discount", discount);
+      console.log("Available", userMeta.discounts);
+      validDiscount = userMeta.discounts.find(d => d._id === discount._id);
+      console.log("Found", validDiscount);
+      if (validDiscount === undefined) throw new Error("Invalid discount");
+    }
+
+    const price = courseMeta.price - (validDiscount ? validDiscount.value : 0);
+
+    if (price > 0) {
+      if (stripeToken === undefined || stripeToken.length < 1) {
+        throw new Error("Stripe token is invalid");
+      }
+
+      // Charge the user's card:
+      const charge = await stripe.charges.create({
+        amount: price * 100,
+        currency: "GBP",
+        description: "Story Course: " + courseDetails.name,
+        source: stripeToken
+      });
+    }
+
+    if (validDiscount !== undefined) {
+      const newDiscounts = userMeta.discounts.filter(
+        d => d._id !== (validDiscount as StoryTypes.Discount)._id
+      );
+      // TODO: cancel out this discount so it can't be re-used
+      const result = await docClient
+        .update({
+          TableName: TABLES.user,
+          Key: {
+            _id: userMeta._id
+          },
+
+          UpdateExpression: "set discounts=:d",
+          ExpressionAttributeValues: {
+            ":d": newDiscounts
+          }
+        })
+        .promise();
+    }
 
     // now that's done, we can actually add the course to the user's class
     await assignCourse(userMeta.class, courseId, courseDetails.name);
@@ -113,7 +157,6 @@ async function assignCourse(
         return job;
       } else if (job.status === "waiting" || job.status === "running") {
         // delay before checking status
-        console.log("Will retry shortly");
         await new Promise(r => setTimeout(r, 100));
         // check status of the job
         return waitForJob(

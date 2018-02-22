@@ -187,6 +187,8 @@ functions:
       CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
       CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
       STRIPE_SECRET_KEY: ${file(keys.yml):STRIPE_SECRET_KEY.${self:provider.stage}}
+      MAILCHIMP_API_KEY: ${file(keys.yml):MAILCHIMP_API_KEY}
+      MAILCHIMP_LIST_ID: 107993
       CENTURY_ORG_ID: 0adee573-b3e3-46cf-a16b-32980590e2fe
       AWS_PROFILE: story-serverless
     events:
