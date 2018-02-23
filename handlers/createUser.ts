@@ -2,11 +2,21 @@ import { fetchToken } from "./auth";
 import fetch from "node-fetch";
 import { Handler, APIGatewayEvent } from "aws-lambda";
 import axios from "axios";
+import { createUserMeta } from "./get_user_meta";
 
-import { Result, serialiseLambda } from "story-backend-utils";
-import { CENTURY_ORG_ID, CLASS_CODE, SENDGRID_API_KEY } from "../config";
+import { Result, serialiseLambda, StoryTypes } from "story-backend-utils";
+import {
+  CENTURY_ORG_ID,
+  CLASS_CODE,
+  SENDGRID_API_KEY,
+  TABLES
+} from "../config";
+import { DynamoDB } from "aws-sdk";
 
 const Result = Promise;
+var docClient = new DynamoDB.DocumentClient({
+  region: "eu-west-2"
+});
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = JSON.parse(e.body || "{}");
@@ -16,7 +26,8 @@ export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
       req.firstname,
       req.lastname,
       req.password,
-      req.passwordConfirmation
+      req.passwordConfirmation,
+      req.referral_code
     )
   );
 }
@@ -26,8 +37,13 @@ async function simpleHandler(
   firstname: string,
   lastname: string,
   password: string,
-  passwordConfirmation: string
-): Result<{ success: boolean; message?: string }> {
+  passwordConfirmation: string,
+  referral_code?: string
+): Result<{
+  success: boolean;
+  message?: string;
+  story?: StoryTypes.StoryUserFields;
+}> {
   try {
     console.log(username, password, passwordConfirmation);
     // basic validation
@@ -128,9 +144,57 @@ async function simpleHandler(
 }
 */
 
-    console.log(register);
-    return { result: { success: true }, statusCode: 200 };
+    // Give a discount to referrer
+
+    if (referral_code !== undefined && referral_code.length > 0) {
+      console.log("Rewarding referrer", referral_code);
+      const referrer = await docClient
+        .query({
+          TableName: TABLES.user,
+          IndexName: "ReferralCode",
+          KeyConditionExpression: "referral_code = :code",
+          ExpressionAttributeValues: {
+            ":code": referral_code
+          }
+        })
+        .promise();
+      console.log("Got ", referrer.Items);
+      if (referrer.Items && referrer.Items.length > 0) {
+        const referralDiscount: StoryTypes.Discount = {
+          _id: `discount_${Math.random() * 1000000000}`,
+          value: 20,
+          name: "Referral Bonus for " + firstname + " " + lastname
+        };
+
+        const referrer_result = await docClient
+          .update({
+            TableName: TABLES.user,
+
+            Key: {
+              _id: referrer.Items[0]._id
+            },
+
+            UpdateExpression: "SET #discounts = list_append(#discounts, :d)",
+            ExpressionAttributeValues: {
+              ":d": [referralDiscount]
+            },
+            ExpressionAttributeNames: {
+              "#discounts": "discounts"
+            },
+            ReturnValues: "ALL_NEW"
+          })
+          .promise();
+
+        console.log(referrer_result);
+      }
+    }
+
+    // Initialise Story data for this user
+    const userMeta = await createUserMeta(register.data.id);
+
+    return { result: { success: true, story: userMeta }, statusCode: 200 };
   } catch (e) {
+    console.error(e);
     return {
       result: { success: false, message: e.response.data.message },
       statusCode: 500

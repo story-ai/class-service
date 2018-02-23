@@ -268,12 +268,25 @@ resources:
         AttributeDefinitions:
           - AttributeName: _id
             AttributeType: S
+          - AttributeName: referral_code
+            AttributeType: S
         KeySchema:
           - AttributeName: _id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
+        GlobalSecondaryIndexes:
+          - IndexName: ReferralCode
+            KeySchema:
+              - AttributeName: referral_code
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL          
+            ProvisionedThroughput:
+              ReadCapacityUnits: 5
+              WriteCapacityUnits: 5
+
 
     DynamoDBCourses:
       Type: AWS::DynamoDB::Table

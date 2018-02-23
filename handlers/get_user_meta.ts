@@ -27,13 +27,21 @@ export async function getUserMeta(
     .promise();
 
   if (result.Item !== undefined) {
-    console.log("Re-used existing class");
+    console.log("Re-used existjing class");
     return {
       _id: result.Item._id,
       class: result.Item.class,
-      discounts: result.Item.discounts || []
+      discounts: result.Item.discounts || [],
+      referral_code: result.Item.referral_code
     };
   }
+
+  return createUserMeta(userId);
+}
+
+export async function createUserMeta(
+  userId: string
+): Promise<StoryTypes.StoryUserFields> {
   const token = await fetchToken();
 
   // get the user object we are going to modify
@@ -107,9 +115,11 @@ export async function getUserMeta(
         name: "Introductory Discount",
         value: 5
       }
-    ]
+    ],
+    referral_code: await getNewReferralCode(user)
   };
 
+  console.log("Going to register newItem", newItem);
   const dynamoUpdate = docClient
     .put({
       TableName: TABLES.user,
@@ -119,6 +129,7 @@ export async function getUserMeta(
 
   // wait for things to settle
   await Promise.all([dynamoUpdate, centuryUpdate]);
+  console.log("Created user meta");
 
   return newItem;
 }
@@ -139,4 +150,29 @@ export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
       };
     }
   });
+}
+
+async function getNewReferralCode(user: CenturyTypes.User): Promise<string> {
+  // TODO: Generate "friendlier" codes
+
+  const code = Math.random()
+    .toString(36)
+    .substring(2, 15)
+    .toUpperCase();
+
+  const existingCode = await docClient
+    .query({
+      TableName: TABLES.user,
+      IndexName: "ReferralCode",
+      KeyConditionExpression: "referral_code = :code",
+      ExpressionAttributeValues: {
+        ":code": code
+      }
+    })
+    .promise();
+
+  if (existingCode.Items && existingCode.Items.length > 1)
+    return getNewReferralCode(user);
+
+  return code;
 }
