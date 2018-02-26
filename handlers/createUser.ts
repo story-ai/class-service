@@ -146,6 +146,7 @@ async function simpleHandler(
 
     // Give a discount to referrer
 
+    let referral_bonus = false;
     if (referral_code !== undefined && referral_code.length > 0) {
       console.log("Rewarding referrer", referral_code);
       const referrer = await docClient
@@ -186,11 +187,12 @@ async function simpleHandler(
           .promise();
 
         console.log(referrer_result);
+        referral_bonus = true;
       }
     }
 
     // Initialise Story data for this user
-    const userMeta = await createUserMeta(register.data.id);
+    const userMeta = await createUserMeta(register.data.id, referral_bonus);
 
     return { result: { success: true, story: userMeta }, statusCode: 200 };
   } catch (e) {

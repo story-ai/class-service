@@ -36,11 +36,12 @@ export async function getUserMeta(
     };
   }
 
-  return createUserMeta(userId);
+  return createUserMeta(userId, false);
 }
 
 export async function createUserMeta(
-  userId: string
+  userId: string,
+  referral_bonus: boolean
 ): Promise<StoryTypes.StoryUserFields> {
   const token = await fetchToken();
 
@@ -106,7 +107,7 @@ export async function createUserMeta(
     });
 
   // persist this new class to the meta info in Story DB
-  const newItem = {
+  const newItem: StoryTypes.StoryUserFields = {
     _id: userId,
     class: classId,
     discounts: [
@@ -118,6 +119,14 @@ export async function createUserMeta(
     ],
     referral_code: await getNewReferralCode(user)
   };
+
+  if (referral_bonus) {
+    newItem.discounts.push({
+      _id: "discount_" + Math.floor(Math.random() * 1000000),
+      name: "Referral Bonus",
+      value: 10
+    });
+  }
 
   console.log("Going to register newItem", newItem);
   const dynamoUpdate = docClient
