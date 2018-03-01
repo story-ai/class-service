@@ -348,11 +348,15 @@ resources:
                 - dynamodb:Scan
                 - dynamodb:BatchGetItem
                 - dynamodb:PutItem
+                - dynamodb:UpdateItem
+                - dynamodb:Query
+
               Resource: 
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-teacher
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-class
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-user
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-course
+                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-user/*
         Roles:
           - Ref: IamRoleLambdaExecution
 
