@@ -19,7 +19,8 @@ export const TABLES = {
   user: `${stage}-story-user`,
   teacher: `${stage}-story-teacher`,
   course: `${stage}-story-course`,
-  class: `${stage}-story-class`
+  class: `${stage}-story-class`,
+  discountTemplates: `${stage}-story-discount-templates`
 };
 
 export const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;

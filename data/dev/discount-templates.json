@@ -1,0 +1,49 @@
+{
+  "dev-story-discount-templates": [
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "a66368c9-c6a1-4c5f-89ed-5ce5099b1008"
+          },
+          "name": {
+            "S": "Introductory Discount"
+          },
+          "value": {
+            "N": "5"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "5571053f-7e10-4dc3-8bf1-76e2cfa562cc"
+          },
+          "name": {
+            "S": "Referral Discount"
+          },
+          "value": {
+            "N": "10"
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "c31efdb5-2941-4ab2-adaf-30280614857a"
+          },
+          "name": {
+            "S": "Referral Reward"
+          },
+          "value": {
+            "N": "20"
+          }
+        }
+      }
+    }
+  ]
+}

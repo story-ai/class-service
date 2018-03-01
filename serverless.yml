@@ -316,6 +316,20 @@ resources:
           ReadCapacityUnits: 5
           WriteCapacityUnits: 5
 
+    DynamoDBDiscountTemplates:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.stage}-story-discount-templates
+        AttributeDefinitions:
+          - AttributeName: _id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: _id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 5
+          WriteCapacityUnits: 5
+
     DynamoDBTeachers:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -337,6 +351,7 @@ resources:
         - DynamoDBClasses
         - DynamoDBCourses
         - DynamoDBUsers
+        - DynamoDBDiscountTemplates
       Properties:
         PolicyName: ${self:provider.stage}-lambda-dynamodb
         PolicyDocument:
@@ -356,6 +371,7 @@ resources:
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-class
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-user
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-course
+                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-discount-templates
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-user/*
         Roles:
           - Ref: IamRoleLambdaExecution

@@ -3,6 +3,7 @@ import fetch from "node-fetch";
 import { Handler, APIGatewayEvent } from "aws-lambda";
 import axios from "axios";
 import { createUserMeta } from "./get_user_meta";
+import { buildDiscount, DiscountTemplates } from "./discounts/getTemplates";
 
 import { Result, serialiseLambda, StoryTypes } from "story-backend-utils";
 import {
@@ -161,11 +162,10 @@ async function simpleHandler(
         .promise();
       console.log("Got ", referrer.Items);
       if (referrer.Items && referrer.Items.length > 0) {
-        const referralDiscount: StoryTypes.Discount = {
-          _id: `discount_${Math.random() * 1000000000}`,
-          value: 20,
-          name: "Referral Bonus for " + firstname + " " + lastname
-        };
+        const referralDiscount = await buildDiscount(
+          DiscountTemplates.REFERRAL_REWARD,
+          `Referral Reward for ${firstname} ${lastname}`
+        );
 
         const referrer_result = await docClient
           .update({

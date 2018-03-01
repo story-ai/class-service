@@ -9,6 +9,7 @@ import {
   StoryTypes
 } from "story-backend-utils";
 import { CENTURY_ORG_ID, TABLES } from "../config";
+import { DiscountTemplates, buildDiscount } from "./discounts/getTemplates";
 
 var docClient = new DynamoDB.DocumentClient({
   region: "eu-west-2"
@@ -110,22 +111,14 @@ export async function createUserMeta(
   const newItem: StoryTypes.StoryUserFields = {
     _id: userId,
     class: classId,
-    discounts: [
-      {
-        _id: "discount_" + Math.floor(Math.random() * 1000000),
-        name: "Introductory Discount",
-        value: 5
-      }
-    ],
+    discounts: [await buildDiscount(DiscountTemplates.INTRODUCTORY)],
     referral_code: await getNewReferralCode(user)
   };
 
   if (referral_bonus) {
-    newItem.discounts.push({
-      _id: "discount_" + Math.floor(Math.random() * 1000000),
-      name: "Referral Bonus",
-      value: 10
-    });
+    newItem.discounts.push(
+      await buildDiscount(DiscountTemplates.REFERRAL_BONUS)
+    );
   }
 
   console.log("Going to register newItem", newItem);
