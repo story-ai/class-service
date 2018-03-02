@@ -53,7 +53,9 @@ export async function getCourseMetas(
   return keyBy(
     result.map(item => ({
       _id: item._id.S!,
-      price: parseFloat(item.price.N!)
+      price: parseFloat(item.price.N!),
+      name: item.name && item.name.S,
+      order: item.order !== undefined && parseFloat(item.order.N!)
     })),
     "_id"
   );

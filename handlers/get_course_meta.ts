@@ -29,7 +29,9 @@ export async function getCourseMeta(
 
   const item = {
     _id: result.Item!._id.S!,
-    price: parseFloat(result.Item!.price.N!)
+    price: parseFloat(result.Item!.price.N!),
+    name: result.Item!.name && result.Item!.name.S!,
+    order: result.Item!.order !== undefined && parseFloat(result.Item!.order.N!)
   };
 
   return item;

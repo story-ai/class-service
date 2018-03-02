@@ -4,22 +4,168 @@
       "PutRequest": {
         "Item": {
           "_id": {
-            "S": "0d627068-7114-4a4b-ac5d-3c8a4ae28f31"
+            "S": "8d7c2c15-76ee-41e6-9fde-1f63e972a445"
+          },
+          "name": {
+            "S": "English Language - GCSE - Creative Writing"
+          },
+          "order": {
+            "N": "5"
           },
           "price": {
-            "N": "12"
+            "N": "8.99"
           }
         }
       }
     },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "62545876-ca30-4686-8198-bd7db385058a"
+          },
+          "name": {
+            "S": "English Language - GCSE - Reading (Fiction)"
+          },
+          "order": {
+            "N": "5"
+          },
+          "price": {
+            "N": "8.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "1d0e92e1-8949-44e3-a5dc-06348f859e5e"
+          },
+          "name": {
+            "S": "English Literature - GCSE - An Inspector Calls"
+          },
+          "order": {
+            "N": "4"
+          },
+          "price": {
+            "N": "14.99"
+          }
+        }
+      }
+    },
+
     {
       "PutRequest": {
         "Item": {
           "_id": {
             "S": "35c04492-91d5-4f6f-9461-3f72a27330b0"
           },
+          "name": {
+            "S": "English Language - GCSE - Writing"
+          },
+          "order": {
+            "N": "5"
+          },
           "price": {
-            "N": "12"
+            "N": "8.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "d161ec20-acb7-40fa-ac6a-708bf473c028"
+          },
+          "name": {
+            "S": "English Literature - GCSE - Macbeth"
+          },
+          "order": {
+            "N": "4"
+          },
+          "price": {
+            "N": "14.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "06fc1556-a19f-4cc0-9b34-75f284f1b8ed"
+          },
+          "name": {
+            "S": "English Language - GCSE - Reading (Non-fiction)"
+          },
+          "order": {
+            "N": "5"
+          },
+          "price": {
+            "N": "8.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "65052214-1317-440d-ab66-3bde238c5fa7"
+          },
+          "name": {
+            "S": "Chemistry - GCSE (Higher)"
+          },
+          "order": {
+            "N": "3"
+          },
+          "price": {
+            "N": "48.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "b2125967-4f5f-4628-bbfa-12183bd055e5"
+          },
+          "name": {
+            "S": "Physics - GCSE (Higher)"
+          },
+          "order": {
+            "N": "3"
+          },
+          "price": {
+            "N": "48.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "4fff9aab-dbad-4bea-b387-d300bc05672e"
+          },
+          "name": {
+            "S": "Biology - GCSE (Higher)"
+          },
+          "order": {
+            "N": "3"
+          },
+          "price": {
+            "N": "48.99"
           }
         }
       }
@@ -28,10 +174,16 @@
       "PutRequest": {
         "Item": {
           "_id": {
-            "S": "dae93dda-cfbe-42fa-977b-fbc0f9db357e"
+            "S": "7f1a5e6c-8397-4fdb-861d-be3b95913c4c"
+          },
+          "name": {
+            "S": "Cryptocurrency - The Basics of Bitcoin and Blockchain"
+          },
+          "order": {
+            "N": "2"
           },
           "price": {
-            "N": "12"
+            "N": "0"
           }
         }
       }
@@ -40,10 +192,16 @@
       "PutRequest": {
         "Item": {
           "_id": {
-            "S": "046afaae-b860-4ad6-ac32-4b131af5835f"
+            "S": "5559662d-2eba-4279-b8e5-62aee12ad10c"
+          },
+          "name": {
+            "S": "How to use the CENTURY platform - Start Here"
+          },
+          "order": {
+            "N": "1"
           },
           "price": {
-            "N": "12"
+            "N": "0"
           }
         }
       }
@@ -52,10 +210,16 @@
       "PutRequest": {
         "Item": {
           "_id": {
-            "S": "7549d9cc-8d75-4d67-9ffd-03754d466ee2"
+            "S": "0363f239-a85c-4696-b32d-e3bb19991e32"
+          },
+          "name": {
+            "S": "English Language - GCSE - Spelling, Punctuation and Grammar"
+          },
+          "order": {
+            "N": "5"
           },
           "price": {
-            "N": "12"
+            "N": "8.99"
           }
         }
       }
@@ -64,70 +228,16 @@
       "PutRequest": {
         "Item": {
           "_id": {
-            "S": "a72b3756-7da4-4b5a-9756-757614a37ec1"
+            "S": "3dea2aa5-6ea0-489e-9a8e-94bb3b83e45c"
+          },
+          "name": {
+            "S": "English Language - GCSE - Language, Structure & Tense"
+          },
+          "order": {
+            "N": "5"
           },
           "price": {
-            "N": "12"
-          }
-        }
-      }
-    },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "78b5dfca-2d07-4c17-a327-3f52bd027eb0"
-          },
-          "price": {
-            "N": "12"
-          }
-        }
-      }
-    },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "4eea5f89-73e1-4480-80f8-4d52e1509334"
-          },
-          "price": {
-            "N": "12"
-          }
-        }
-      }
-    },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "35555db4-3311-4404-8fed-edcb0cab1948"
-          },
-          "price": {
-            "N": "12"
-          }
-        }
-      }
-    },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "8d7c2c15-76ee-41e6-9fde-1f63e972a445"
-          },
-          "price": {
-            "N": "12"
-          }
-        }
-      }
-    },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "d0dcbb52-c409-4480-8a09-62381042672f"
-          },
-          "price": {
-            "N": "12"
+            "N": "8.99"
           }
         }
       }
