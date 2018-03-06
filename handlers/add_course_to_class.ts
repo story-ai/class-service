@@ -25,7 +25,8 @@ export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
       e.pathParameters!.id,
       req.courseId,
       req.stripeToken,
-      req.discount
+      req.discount,
+      req.receipt_email
     )
   );
 }
@@ -34,7 +35,8 @@ async function simpleHandler(
   userId: string,
   courseId: string,
   stripeToken?: string,
-  discount?: Partial<StoryTypes.Discount>
+  discount?: Partial<StoryTypes.Discount>,
+  receipt_email?: string
 ): Result<{ success: boolean; message?: string }> {
   try {
     if (userId === undefined || userId.length < 1)
@@ -70,12 +72,15 @@ async function simpleHandler(
         throw new Error("Stripe token is invalid");
       }
 
+      console.log("Sending receipt to ", receipt_email);
       // Charge the user's card:
       const charge = await stripe.charges.create({
         amount: price * 100,
         currency: "GBP",
         description: "Story Course: " + courseDetails.name,
-        source: stripeToken
+        source: stripeToken,
+        statement_descriptor: "Story: " + courseDetails.name.substr(0, 15),
+        receipt_email
       });
     }
 
