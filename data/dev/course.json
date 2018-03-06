@@ -189,24 +189,7 @@
         }
       }
     },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "7f1a5e6c-8397-4fdb-861d-be3b95913c4c"
-          },
-          "name": {
-            "S": "Cryptocurrency - The Basics of Bitcoin and Blockchain"
-          },
-          "order": {
-            "N": "2"
-          },
-          "price": {
-            "N": "5"
-          }
-        }
-      }
-    },
+
     {
       "PutRequest": {
         "Item": {

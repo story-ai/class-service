@@ -10,7 +10,9 @@ import {
   CENTURY_ORG_ID,
   CLASS_CODE,
   SENDGRID_API_KEY,
-  TABLES
+  TABLES,
+  MAILCHIMP_LIST_ID,
+  MAILCHIMP_API_KEY
 } from "../config";
 import { DynamoDB } from "aws-sdk";
 
@@ -18,39 +20,52 @@ const Result = Promise;
 var docClient = new DynamoDB.DocumentClient({
   region: "eu-west-2"
 });
+console.log("USING ", MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID);
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = JSON.parse(e.body || "{}");
-  serialiseLambda(done, () =>
-    simpleHandler(
-      req.username,
-      req.firstname,
-      req.lastname,
-      req.password,
-      req.passwordConfirmation,
-      req.referral_code
-    )
-  );
+  serialiseLambda(done, () => simpleHandler(req));
 }
 
-async function simpleHandler(
-  username: string,
-  firstname: string,
-  lastname: string,
-  password: string,
-  passwordConfirmation: string,
-  referral_code?: string
-): Result<{
+async function simpleHandler(data: {
+  username: string;
+  firstname: string;
+  lastname: string;
+  password: string;
+  passwordConfirmation: string;
+  referral_code?: string;
+  mailing_list: boolean;
+  terms: boolean;
+}): Result<{
   success: boolean;
   message?: string;
   story?: StoryTypes.StoryUserFields;
 }> {
+  let {
+    username,
+    firstname,
+    lastname,
+    password,
+    passwordConfirmation,
+    referral_code,
+    mailing_list,
+    terms
+  } = data;
   try {
     console.log(username, password, passwordConfirmation);
     // basic validation
     if (username === undefined || username.length < 1) {
       return {
         result: { success: false, message: "Email must be provided" },
+        statusCode: 400
+      };
+    }
+    if (terms !== true) {
+      return {
+        result: {
+          success: false,
+          message: "You must agree to the terms and conditions"
+        },
         statusCode: 400
       };
     }
@@ -95,6 +110,29 @@ async function simpleHandler(
         statusCode: 400
       };
     }
+    if (mailing_list) {
+      await axios.post(
+        `https://us17.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}/members/`,
+        {
+          email_address: username,
+          status: "subscribed",
+          merge_fields: {
+            FNAME: firstname,
+            LNAME: lastname
+          }
+        },
+        {
+          auth: {
+            username: "anyuserworks",
+            password: MAILCHIMP_API_KEY
+          }
+        }
+      );
+      /*
+{
+}
+*/
+    }
 
     // prepare a user object to register
     const token = await fetchToken();
@@ -133,17 +171,6 @@ async function simpleHandler(
         }
       }
     );
-    // TODO: update mailchimp. POST to us17.api.mailchimp.com/3.0/lists/{list_id}/members/
-    /*
-{
-    email_address: username,
-    "status": "subscribed",
-    "merge_fields": {
-        "FNAME": firstname,
-        "LNAME": lastname
-    }
-}
-*/
 
     // Give a discount to referrer
 
