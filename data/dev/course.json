@@ -80,25 +80,6 @@
       "PutRequest": {
         "Item": {
           "_id": {
-            "S": "d161ec20-acb7-40fa-ac6a-708bf473c028"
-          },
-          "name": {
-            "S": "English Literature - GCSE - Macbeth"
-          },
-          "order": {
-            "N": "4"
-          },
-          "price": {
-            "N": "14.99"
-          }
-        }
-      }
-    },
-
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
             "S": "06fc1556-a19f-4cc0-9b34-75f284f1b8ed"
           },
           "name": {
@@ -121,7 +102,7 @@
             "S": "65052214-1317-440d-ab66-3bde238c5fa7"
           },
           "name": {
-            "S": "Chemistry - GCSE (Higher)"
+            "S": "Chemistry - GCSE"
           },
           "order": {
             "N": "3"
@@ -140,7 +121,7 @@
             "S": "b2125967-4f5f-4628-bbfa-12183bd055e5"
           },
           "name": {
-            "S": "Physics - GCSE (Higher)"
+            "S": "Physics - GCSE"
           },
           "order": {
             "N": "3"
@@ -159,13 +140,51 @@
             "S": "4fff9aab-dbad-4bea-b387-d300bc05672e"
           },
           "name": {
-            "S": "Biology - GCSE (Higher)"
+            "S": "Biology - GCSE"
           },
           "order": {
             "N": "3"
           },
           "price": {
             "N": "48.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "3dea2aa5-6ea0-489e-9a8e-94bb3b83e45c"
+          },
+          "name": {
+            "S": "English Language - GCSE - Language, Structure & Tense"
+          },
+          "order": {
+            "N": "5"
+          },
+          "price": {
+            "N": "8.99"
+          }
+        }
+      }
+    },
+
+    {
+      "PutRequest": {
+        "Item": {
+          "_id": {
+            "S": "2e062de1-9d60-47af-bd0b-264a8c9c268f"
+          },
+          "name": {
+            "S": "English Language - Spelling, Punctuation and Grammar"
+          },
+          "order": {
+            "N": "2"
+          },
+          "price": {
+            "N": "25"
           }
         }
       }
@@ -183,7 +202,7 @@
             "N": "2"
           },
           "price": {
-            "N": "0"
+            "N": "5"
           }
         }
       }
@@ -202,42 +221,6 @@
           },
           "price": {
             "N": "0"
-          }
-        }
-      }
-    },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "0363f239-a85c-4696-b32d-e3bb19991e32"
-          },
-          "name": {
-            "S": "English Language - GCSE - Spelling, Punctuation and Grammar"
-          },
-          "order": {
-            "N": "5"
-          },
-          "price": {
-            "N": "8.99"
-          }
-        }
-      }
-    },
-    {
-      "PutRequest": {
-        "Item": {
-          "_id": {
-            "S": "3dea2aa5-6ea0-489e-9a8e-94bb3b83e45c"
-          },
-          "name": {
-            "S": "English Language - GCSE - Language, Structure & Tense"
-          },
-          "order": {
-            "N": "5"
-          },
-          "price": {
-            "N": "8.99"
           }
         }
       }
