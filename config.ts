@@ -24,3 +24,5 @@ export const TABLES = {
 };
 
 export const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
+export const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY!;
+console.log(process.env);
