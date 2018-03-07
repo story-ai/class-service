@@ -4,6 +4,7 @@ import { Handler, APIGatewayEvent } from "aws-lambda";
 import axios from "axios";
 import { createUserMeta } from "./get_user_meta";
 import { buildDiscount, DiscountTemplates } from "./discounts/getTemplates";
+import { notify } from "../utils/slack-notify";
 
 import { Result, serialiseLambda, StoryTypes } from "story-backend-utils";
 import {
@@ -12,7 +13,8 @@ import {
   SENDGRID_API_KEY,
   TABLES,
   MAILCHIMP_LIST_ID,
-  MAILCHIMP_API_KEY
+  MAILCHIMP_API_KEY,
+  SLACK_WEBHOOK_URL
 } from "../config";
 import { DynamoDB } from "aws-sdk";
 
@@ -20,7 +22,6 @@ const Result = Promise;
 var docClient = new DynamoDB.DocumentClient({
   region: "eu-west-2"
 });
-console.log("USING ", MAILCHIMP_API_KEY, MAILCHIMP_LIST_ID);
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = JSON.parse(e.body || "{}");
@@ -111,6 +112,7 @@ async function simpleHandler(data: {
       };
     }
     if (mailing_list) {
+      // TODO: Send welcome emails/add people to mailing list whether or not they have opted in (just not to a marketing group)
       await axios.post(
         `https://us17.api.mailchimp.com/3.0/lists/${MAILCHIMP_LIST_ID}/members/`,
         {
@@ -128,10 +130,6 @@ async function simpleHandler(data: {
           }
         }
       );
-      /*
-{
-}
-*/
     }
 
     // prepare a user object to register
@@ -220,6 +218,8 @@ async function simpleHandler(data: {
 
     // Initialise Story data for this user
     const userMeta = await createUserMeta(register.data.id, referral_bonus);
+
+    notify(`${firstname} ${lastname} just registered to use Story.`);
 
     return { result: { success: true, story: userMeta }, statusCode: 200 };
   } catch (e) {

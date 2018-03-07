@@ -10,6 +10,7 @@ import { getCourseMeta } from "./get_course_meta";
 import { getCourse } from "./get_courses";
 import { getUserMeta } from "./get_user_meta";
 import { Result } from "story-backend-utils";
+import { notify } from "../utils/slack-notify";
 const Result = Promise;
 
 var docClient = new DynamoDB.DocumentClient({
@@ -106,6 +107,22 @@ async function simpleHandler(
 
     // now that's done, we can actually add the course to the user's class
     await assignCourse(userMeta.class, courseId, courseDetails.name);
+
+    notify(
+      `${receipt_email} just unlocked the course "${
+        courseDetails.name
+      }" for ${price.toLocaleString("en-GB", {
+        style: "currency",
+        currency: "GBP"
+      })}${
+        validDiscount === undefined
+          ? ""
+          : ` (discounted from ${courseMeta.price.toLocaleString("en-GB", {
+              style: "currency",
+              currency: "GBP"
+            })})`
+      }.`
+    );
     return { result: { success: true }, statusCode: 200 };
   } catch (e) {
     console.log("ERROR");

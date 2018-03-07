@@ -25,4 +25,6 @@ export const TABLES = {
 
 export const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
 export const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY!;
-console.log(process.env);
+
+export const SLACK_WEBHOOK_URL =
+  "https://hooks.slack.com/services/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";

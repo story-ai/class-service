@@ -145,6 +145,8 @@ export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
         statusCode: 200
       };
     } catch (e) {
+      console.error("ERROR!");
+      console.error(e);
       return {
         result: null,
         statusCode: 500,
