@@ -1,35 +1,33 @@
-import { DynamoDB } from "aws-sdk";
+import { api as prismic } from "prismic-javascript";
 import { StoryTypes } from "story-backend-utils";
-import { TABLES } from "../../config";
 import * as uuid from "uuid";
+import { PRISMIC_URL, PRISMIC_TYPES } from "../../config";
 
-var docClient = new DynamoDB.DocumentClient({
-  region: "eu-west-2"
-});
+const api = prismic(PRISMIC_URL);
 
 export const enum DiscountTemplates {
-  INTRODUCTORY = "a66368c9-c6a1-4c5f-89ed-5ce5099b1008",
-  REFERRAL_BONUS = "5571053f-7e10-4dc3-8bf1-76e2cfa562cc",
-  REFERRAL_REWARD = "c31efdb5-2941-4ab2-adaf-30280614857a"
+  INTRODUCTORY = "introduction",
+  REFERRAL_BONUS = "referral-discount",
+  REFERRAL_REWARD = "referral-reward"
 }
+
+type DiscountTemplate = {
+  value: number;
+  name: string;
+};
 
 export async function buildDiscount(
   id: DiscountTemplates,
   newName?: string
 ): Promise<StoryTypes.Discount> {
-  const template = await docClient
-    .get({
-      TableName: TABLES.discountTemplates,
-      Key: { _id: id }
-    })
-    .promise();
+  const template = await (await api).getByUID<DiscountTemplate>(
+    PRISMIC_TYPES.discountTemplate,
+    id
+  );
 
-  if (template.Item === undefined) {
-    throw new Error("No discount was found with that ID");
-  }
   return {
     _id: uuid.v4(),
-    name: newName || template.Item.name,
-    value: template.Item.value
+    name: newName || template.data.name,
+    value: template.data.value
   };
 }

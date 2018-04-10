@@ -14,12 +14,8 @@ import {
   uniq
 } from "lodash";
 
-import {
-  Result,
-  serialiseLambda,
-  CenturyTypes,
-  StoryTypes
-} from "story-backend-utils";
+import { serialiseLambda } from "../serialiseLambda";
+import { Result, CenturyTypes, StoryTypes } from "story-backend-utils";
 
 import { getToken } from "./auth";
 

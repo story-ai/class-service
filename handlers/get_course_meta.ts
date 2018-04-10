@@ -1,47 +1,37 @@
-import fetch from "node-fetch";
-import { Handler, APIGatewayEvent } from "aws-lambda";
-import { DynamoDB } from "aws-sdk";
-import {
-  Result,
-  serialiseLambda,
-  CenturyTypes,
-  StoryTypes
-} from "story-backend-utils";
-import { TABLES } from "../config";
+import { APIGatewayEvent } from "aws-lambda";
+import { api as prismic } from "prismic-javascript";
+import { serialiseLambda } from "../serialiseLambda";
+import { StoryTypes, PrismicTypes } from "story-backend-utils";
+import { PRISMIC_URL } from "../config";
 
-const dynamodb = new DynamoDB({
-  region: "eu-west-2"
-});
+const api = prismic(PRISMIC_URL);
 
 export async function getCourseMeta(
-  courseID: string
-): Promise<StoryTypes.StoryCourseFields> {
-  const result = await dynamodb
-    .getItem({
-      TableName: TABLES.course,
-      Key: {
-        _id: {
-          S: courseID
-        }
-      }
-    })
-    .promise();
+  identifier: { id: string } | { slug: string }
+): Promise<PrismicTypes.Course> {
+  let course;
+  if ("id" in identifier) {
+    const result = await (await api).getByID<PrismicTypes.Course>(
+      identifier.id
+    );
+    console.log("Got", result.data);
+    course = result.data;
+  } else {
+    course = (await (await api).getByUID<PrismicTypes.Course>(
+      "course",
+      identifier.slug
+    )).data;
+  }
+  console.log("course");
 
-  const item = {
-    _id: result.Item!._id.S!,
-    price: parseFloat(result.Item!.price.N!),
-    name: result.Item!.name && result.Item!.name.S!,
-    order: result.Item!.order !== undefined && parseFloat(result.Item!.order.N!)
-  };
-
-  return item;
+  return course;
 }
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
   const req = e.pathParameters!.id;
   serialiseLambda(done, async () => {
     return {
-      result: await getCourseMeta(req),
+      result: await getCourseMeta({ id: req }),
       statusCode: 200
     };
   });

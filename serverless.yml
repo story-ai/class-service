@@ -21,77 +21,77 @@ package:
 
 functions:
 
-  root:
-    handler: handlers/get_root.index
-    environment:
-      STAGE: ${self:provider.stage}
-      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
-      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: story-serverless
-    events:
-      - http:
-          path: /
-          method: get
-          cors: true
-          documentation:
-            summary: Get a list of class IDs available through Story
-            tags: 
-              - class
-            methodResponses:
-              - statusCode: "200"
-                description: Classes were fetched successfully
-                responseModels:
-                  "application/json": RootResponse
+  # root:
+  #   handler: handlers/get_root.index
+  #   environment:
+  #     STAGE: ${self:provider.stage}
+  #     CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+  #     CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+  #     AWS_PROFILE: story-serverless
+  #   events:
+  #     - http:
+  #         path: /
+  #         method: get
+  #         cors: true
+  #         documentation:
+  #           summary: Get a list of class IDs available through Story
+  #           tags: 
+  #             - class
+  #           methodResponses:
+  #             - statusCode: "200"
+  #               description: Classes were fetched successfully
+  #               responseModels:
+  #                 "application/json": RootResponse
 
-  get_classes:
-    handler: handlers/get_classes.index
-    environment:
-      STAGE: ${self:provider.stage}
-      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
-      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: story-serverless
-    events:
-      - http:
-          path: /class
-          method: get
-          cors: true
-          documentation:
-            summary: Get details for all classes with the given IDs
-            tags: 
-              - class
-            queryParams:
-              - name: ids
-                description: Class IDs to fetch
-            methodResponses:
-              - statusCode: "200"
-                description: Classes were fetched successfully
-                responseModels:
-                  "application/json": ClassResponse
+  # get_classes:
+  #   handler: handlers/get_classes.index
+  #   environment:
+  #     STAGE: ${self:provider.stage}
+  #     CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+  #     CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+  #     AWS_PROFILE: story-serverless
+  #   events:
+  #     - http:
+  #         path: /class
+  #         method: get
+  #         cors: true
+  #         documentation:
+  #           summary: Get details for all classes with the given IDs
+  #           tags: 
+  #             - class
+  #           queryParams:
+  #             - name: ids
+  #               description: Class IDs to fetch
+  #           methodResponses:
+  #             - statusCode: "200"
+  #               description: Classes were fetched successfully
+  #               responseModels:
+  #                 "application/json": ClassResponse
 
-  get_teachers:
-    handler: handlers/get_teachers.index
-    environment:
-      STAGE: ${self:provider.stage}
-      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
-      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: story-serverless
-    events:
-      - http:
-          path: /teacher
-          method: get
-          cors: true
-          documentation:
-            summary: Get all teachers for the given IDs
-            tags: 
-              - class
-            queryParams:
-              - name: ids
-                description: Teacher IDs to fetch
-            methodResponses:
-              - statusCode: "200"
-                description: Teachers were fetched successfully
-                responseModels:
-                  "application/json": TeacherResponse
+  # get_teachers:
+  #   handler: handlers/get_teachers.index
+  #   environment:
+  #     STAGE: ${self:provider.stage}
+  #     CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+  #     CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+  #     AWS_PROFILE: story-serverless
+  #   events:
+  #     - http:
+  #         path: /teacher
+  #         method: get
+  #         cors: true
+  #         documentation:
+  #           summary: Get all teachers for the given IDs
+  #           tags: 
+  #             - class
+  #           queryParams:
+  #             - name: ids
+  #               description: Teacher IDs to fetch
+  #           methodResponses:
+  #             - statusCode: "200"
+  #               description: Teachers were fetched successfully
+  #               responseModels:
+  #                 "application/json": TeacherResponse
 
   get_user_meta:
     handler: handlers/get_user_meta.index
@@ -156,29 +156,29 @@ functions:
                 responseModels:
                   "application/json": APIError
 
-  get_courses:
-    handler: handlers/get_all_course_meta.index
-    # handler: handlers/get_courses.index
-    environment:
-      STAGE: ${self:provider.stage}
-      CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
-      CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
-      AWS_PROFILE: story-serverless
-    events:
-      - http:
-          path: /course
-          method: get
-          cors: true
-          documentation:
-            summary: Get all courses for the given IDs
-            tags: 
-              - class
-            queryParams:
-              - name: ids
-                description: Course IDs to fetch
-            methodResponses:
-              - statusCode: "200"
-                description: Courses were fetched successfully
+  # get_courses:
+  #   handler: handlers/get_all_course_meta.index
+  #   # handler: handlers/get_courses.index
+  #   environment:
+  #     STAGE: ${self:provider.stage}
+  #     CENTURY_ADMIN_EMAIL: ${file(keys.yml):CENTURY_ADMIN_EMAIL}
+  #     CENTURY_ADMIN_PASSWORD: ${file(keys.yml):CENTURY_ADMIN_PASSWORD}
+  #     AWS_PROFILE: story-serverless
+  #   events:
+  #     - http:
+  #         path: /course
+  #         method: get
+  #         cors: true
+  #         documentation:
+  #           summary: Get all courses for the given IDs
+  #           tags: 
+  #             - class
+  #           queryParams:
+  #             - name: ids
+  #               description: Course IDs to fetch
+  #           methodResponses:
+  #             - statusCode: "200"
+  #               description: Courses were fetched successfully
 
   addToClass:
     handler: handlers/add_course_to_class.index
@@ -289,70 +289,70 @@ resources:
               WriteCapacityUnits: 5
 
 
-    DynamoDBCourses:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.stage}-story-course
-        AttributeDefinitions:
-          - AttributeName: _id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: _id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+    # DynamoDBCourses:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: ${self:provider.stage}-story-course
+    #     AttributeDefinitions:
+    #       - AttributeName: _id
+    #         AttributeType: S
+    #     KeySchema:
+    #       - AttributeName: _id
+    #         KeyType: HASH
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 5
+    #       WriteCapacityUnits: 5
 
-    DynamoDBClasses:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.stage}-story-class
-        AttributeDefinitions:
-          - AttributeName: _id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: _id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+    # DynamoDBClasses:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: ${self:provider.stage}-story-class
+    #     AttributeDefinitions:
+    #       - AttributeName: _id
+    #         AttributeType: S
+    #     KeySchema:
+    #       - AttributeName: _id
+    #         KeyType: HASH
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 5
+    #       WriteCapacityUnits: 5
 
-    DynamoDBDiscountTemplates:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.stage}-story-discount-templates
-        AttributeDefinitions:
-          - AttributeName: _id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: _id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+    # DynamoDBDiscountTemplates:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: ${self:provider.stage}-story-discount-templates
+    #     AttributeDefinitions:
+    #       - AttributeName: _id
+    #         AttributeType: S
+    #     KeySchema:
+    #       - AttributeName: _id
+    #         KeyType: HASH
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 5
+    #       WriteCapacityUnits: 5
 
-    DynamoDBTeachers:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.stage}-story-teacher
-        AttributeDefinitions:
-          - AttributeName: _id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: _id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 5
-          WriteCapacityUnits: 5
+    # DynamoDBTeachers:
+    #   Type: AWS::DynamoDB::Table
+    #   Properties:
+    #     TableName: ${self:provider.stage}-story-teacher
+    #     AttributeDefinitions:
+    #       - AttributeName: _id
+    #         AttributeType: S
+    #     KeySchema:
+    #       - AttributeName: _id
+    #         KeyType: HASH
+    #     ProvisionedThroughput:
+    #       ReadCapacityUnits: 5
+    #       WriteCapacityUnits: 5
 
     DynamoDBIamPolicy:
       Type: AWS::IAM::Policy
       DependsOn: 
-        - DynamoDBTeachers
-        - DynamoDBClasses
-        - DynamoDBCourses
+        # - DynamoDBTeachers
+        # - DynamoDBClasses
+        # - DynamoDBCourses
         - DynamoDBUsers
-        - DynamoDBDiscountTemplates
+        # - DynamoDBDiscountTemplates
       Properties:
         PolicyName: ${self:provider.stage}-lambda-dynamodb
         PolicyDocument:
@@ -368,11 +368,11 @@ resources:
                 - dynamodb:Query
 
               Resource: 
-                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-teacher
-                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-class
+                # - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-teacher
+                # - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-class
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-user
-                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-course
-                - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-discount-templates
+                # - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-course
+                # - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-discount-templates
                 - arn:aws:dynamodb:*:*:table/${self:provider.stage}-story-user/*
         Roles:
           - Ref: IamRoleLambdaExecution

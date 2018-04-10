@@ -16,11 +16,11 @@ export const CENTURY_ORG_ID =
 const stage = process.env.STAGE;
 
 export const TABLES = {
-  user: `${stage}-story-user`,
-  teacher: `${stage}-story-teacher`,
-  course: `${stage}-story-course`,
-  class: `${stage}-story-class`,
-  discountTemplates: `${stage}-story-discount-templates`
+  user: `${stage}-story-user`
+  // teacher: `${stage}-story-teacher`,
+  // course: `${stage}-story-course`,
+  // class: `${stage}-story-class`,
+  // discountTemplates: `${stage}-story-discount-templates`
 };
 
 export const MAILCHIMP_LIST_ID = process.env.MAILCHIMP_LIST_ID;
@@ -28,3 +28,10 @@ export const MAILCHIMP_API_KEY = process.env.MAILCHIMP_API_KEY!;
 
 export const SLACK_WEBHOOK_URL =
   "https://hooks.slack.com/services/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";
+
+export const PRISMIC_URL = "https://story-ai.prismic.io/api/v2";
+
+export const PRISMIC_TYPES = {
+  course: "course",
+  discountTemplate: "discount_template"
+};

@@ -1,16 +1,17 @@
 import { APIGatewayEvent } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
 import axios, { AxiosPromise } from "axios";
-import { serialiseLambda, StoryTypes } from "story-backend-utils";
+import { StoryTypes } from "story-backend-utils";
+import { serialiseLambda } from "../serialiseLambda";
 import * as Stripe from "stripe";
 
 import { CENTURY_ORG_ID, STRIPE_SECRET_KEY, TABLES } from "../config";
 import { fetchToken, getToken } from "./auth";
-import { getCourseMeta } from "./get_course_meta";
 import { getCourse } from "./get_courses";
 import { getUserMeta } from "./get_user_meta";
 import { Result } from "story-backend-utils";
 import { notify } from "../utils/slack-notify";
+import { getCourseMeta } from "./get_course_meta";
 const Result = Promise;
 
 var docClient = new DynamoDB.DocumentClient({
@@ -34,7 +35,7 @@ export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
 
 async function simpleHandler(
   userId: string,
-  courseId: string,
+  prismicCourseId: string,
   stripeToken?: string,
   discount?: Partial<StoryTypes.Discount>,
   receipt_email?: string
@@ -42,18 +43,18 @@ async function simpleHandler(
   try {
     if (userId === undefined || userId.length < 1)
       throw new Error("User ID invalid");
-    if (courseId === undefined || courseId.length < 1)
+    if (prismicCourseId === undefined || prismicCourseId.length < 1)
       throw new Error("Course ID invalid");
 
     // get an admin login token for century
     let token = await getToken();
 
     // Firstly, retrieve the course details so we know how much to charge
-    const [courseMeta, courseDetails, userMeta] = await Promise.all([
-      getCourseMeta(courseId),
-      getCourse(courseId, token),
+    const [courseMeta, userMeta] = await Promise.all([
+      getCourseMeta({ id: prismicCourseId }),
       getUserMeta(userId)
     ]);
+    const courseDetails = await getCourse(courseMeta.century_course_id, token);
 
     let validDiscount: StoryTypes.Discount | undefined;
 
@@ -66,7 +67,10 @@ async function simpleHandler(
       if (validDiscount === undefined) throw new Error("Invalid discount");
     }
 
-    const price = courseMeta.price - (validDiscount ? validDiscount.value : 0);
+    const price = Math.max(
+      0,
+      courseMeta.price - (validDiscount ? validDiscount.value : 0)
+    );
 
     if (price > 0) {
       if (stripeToken === undefined || stripeToken.length < 1) {
@@ -89,7 +93,7 @@ async function simpleHandler(
       const newDiscounts = userMeta.discounts.filter(
         d => d._id !== (validDiscount as StoryTypes.Discount)._id
       );
-      // TODO: cancel out this discount so it can't be re-used
+
       const result = await docClient
         .update({
           TableName: TABLES.user,
@@ -106,7 +110,7 @@ async function simpleHandler(
     }
 
     // now that's done, we can actually add the course to the user's class
-    await assignCourse(userMeta.class, courseId, courseDetails.name);
+    await assignCourse(userMeta.class, prismicCourseId, courseDetails.name);
 
     notify(
       `${receipt_email} just unlocked the course "${
@@ -120,7 +124,7 @@ async function simpleHandler(
           : ` (discounted from ${courseMeta.price.toLocaleString("en-GB", {
               style: "currency",
               currency: "GBP"
-            })})`
+            })} with "${validDiscount.name}")`
       }.`
     );
     return { result: { success: true }, statusCode: 200 };

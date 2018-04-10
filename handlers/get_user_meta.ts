@@ -2,12 +2,8 @@ import { fetchToken } from "./auth";
 import { Handler, APIGatewayEvent } from "aws-lambda";
 import { DynamoDB } from "aws-sdk";
 import axios from "axios";
-import {
-  Result,
-  serialiseLambda,
-  CenturyTypes,
-  StoryTypes
-} from "story-backend-utils";
+import { Result, CenturyTypes, StoryTypes } from "story-backend-utils";
+import { serialiseLambda } from "../serialiseLambda";
 import { CENTURY_ORG_ID, TABLES } from "../config";
 import { DiscountTemplates, buildDiscount } from "./discounts/getTemplates";
 
@@ -28,7 +24,7 @@ export async function getUserMeta(
     .promise();
 
   if (result.Item !== undefined) {
-    console.log("Re-used existjing class");
+    console.log("Re-used existing class");
     return {
       _id: result.Item._id,
       class: result.Item.class,

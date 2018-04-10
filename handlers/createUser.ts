@@ -6,7 +6,8 @@ import { createUserMeta } from "./get_user_meta";
 import { buildDiscount, DiscountTemplates } from "./discounts/getTemplates";
 import { notify } from "../utils/slack-notify";
 
-import { Result, serialiseLambda, StoryTypes } from "story-backend-utils";
+import { serialiseLambda } from "../serialiseLambda";
+import { Result, StoryTypes } from "story-backend-utils";
 import {
   CENTURY_ORG_ID,
   CLASS_CODE,
