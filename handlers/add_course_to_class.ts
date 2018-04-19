@@ -21,11 +21,13 @@ var docClient = new DynamoDB.DocumentClient({
 const stripe = new Stripe(STRIPE_SECRET_KEY);
 
 export function index(e: APIGatewayEvent, ctx: any, done = () => {}) {
+  console.log("Received", e.body);
   const req = JSON.parse(e.body || "{}");
+  console.log("Parsed as ", req);
   serialiseLambda(done, () =>
     simpleHandler(
       e.pathParameters!.id,
-      req.courseId,
+      req.prismicCourseId,
       req.stripeToken,
       req.discount,
       req.receipt_email
@@ -54,7 +56,7 @@ async function simpleHandler(
       getCourseMeta({ id: prismicCourseId }),
       getUserMeta(userId)
     ]);
-    const courseDetails = await getCourse(courseMeta.century_course_id, token);
+    const courseId = courseMeta.century_course_id;
 
     let validDiscount: StoryTypes.Discount | undefined;
 
@@ -71,6 +73,8 @@ async function simpleHandler(
       0,
       courseMeta.price - (validDiscount ? validDiscount.value : 0)
     );
+
+    const courseDetails = await getCourse(courseMeta.century_course_id, token);
 
     if (price > 0) {
       if (stripeToken === undefined || stripeToken.length < 1) {
@@ -90,9 +94,16 @@ async function simpleHandler(
     }
 
     if (validDiscount !== undefined) {
-      const newDiscounts = userMeta.discounts.filter(
-        d => d._id !== (validDiscount as StoryTypes.Discount)._id
-      );
+      const newDiscounts = userMeta.discounts
+        // reduce the value of the discount we just used
+        .map(
+          d =>
+            d._id === (validDiscount as StoryTypes.Discount)._id
+              ? { ...d, value: d.value - courseMeta.price }
+              : d
+        )
+        // remove any discounts that have been fully used up
+        .filter(d => d.value > 0);
 
       const result = await docClient
         .update({
@@ -110,7 +121,7 @@ async function simpleHandler(
     }
 
     // now that's done, we can actually add the course to the user's class
-    await assignCourse(userMeta.class, prismicCourseId, courseDetails.name);
+    await assignCourse(userMeta.class, courseId, courseDetails.name);
 
     notify(
       `${receipt_email} just unlocked the course "${
