@@ -1,9 +1,7 @@
-import { api as prismic } from "prismic-javascript";
 import { StoryTypes } from "story-backend-utils";
 import * as uuid from "uuid";
-import { PRISMIC_URL, PRISMIC_TYPES } from "../../config";
-
-const api = prismic(PRISMIC_URL);
+import { PRISMIC_TYPES } from "../../config";
+import { initApi } from "../../utils/prismic";
 
 export const enum DiscountTemplates {
   INTRODUCTORY = "introduction",
@@ -20,7 +18,8 @@ export async function buildDiscount(
   id: DiscountTemplates,
   newName?: string
 ): Promise<StoryTypes.Discount> {
-  const template = await (await api).getByUID<DiscountTemplate>(
+  const api = await initApi();
+  const template = await api.getByUID<DiscountTemplate>(
     PRISMIC_TYPES.discountTemplate,
     id
   );

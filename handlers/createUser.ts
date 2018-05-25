@@ -36,6 +36,7 @@ async function simpleHandler(data: {
   password: string;
   passwordConfirmation: string;
   referral_code?: string;
+  no_notify?: boolean;
   mailing_list: boolean;
   terms: boolean;
 }): Result<{
@@ -51,6 +52,7 @@ async function simpleHandler(data: {
     passwordConfirmation,
     referral_code,
     mailing_list,
+    no_notify,
     terms
   } = data;
   try {
@@ -71,7 +73,7 @@ async function simpleHandler(data: {
         statusCode: 400
       };
     }
-    if (username.match(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i) === null) {
+    if (username.match(/^[A-Z0-9._%'+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i) === null) {
       return {
         result: { success: false, message: "Email format is invalid" },
         statusCode: 400
@@ -141,7 +143,7 @@ async function simpleHandler(data: {
       {
         password,
         personal: { name: { first: firstname, last: lastname } },
-        isTest: true,
+        isTest: process.env.STAGE !== "prod",
 
         contact: {
           emails: [
@@ -220,7 +222,9 @@ async function simpleHandler(data: {
     // Initialise Story data for this user
     const userMeta = await createUserMeta(register.data.id, referral_bonus);
 
-    notify(`${firstname} ${lastname} just registered to use Story.`);
+    if (no_notify === undefined || no_notify === false) {
+      notify(`${firstname} ${lastname} just registered to use Story.`);
+    }
 
     return { result: { success: true, story: userMeta }, statusCode: 200 };
   } catch (e) {

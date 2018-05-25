@@ -1,23 +1,20 @@
 import { APIGatewayEvent } from "aws-lambda";
-import { api as prismic } from "prismic-javascript";
 import { serialiseLambda } from "../serialiseLambda";
 import { StoryTypes, PrismicTypes } from "story-backend-utils";
 import { PRISMIC_URL } from "../config";
-
-const api = prismic(PRISMIC_URL);
+import { initApi } from "../utils/prismic";
 
 export async function getCourseMeta(
   identifier: { id: string } | { slug: string }
 ): Promise<PrismicTypes.Course> {
   let course;
+  const api = await initApi();
   if ("id" in identifier) {
-    const result = await (await api).getByID<PrismicTypes.Course>(
-      identifier.id
-    );
+    const result = await api.getByID<PrismicTypes.Course>(identifier.id);
     console.log("Got", result.data);
     course = result.data;
   } else {
-    course = (await (await api).getByUID<PrismicTypes.Course>(
+    course = (await api.getByUID<PrismicTypes.Course>(
       "course",
       identifier.slug
     )).data;

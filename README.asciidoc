@@ -1,26 +1,26 @@
-= Story Sample Service
+= Story Class Service
 Christopher Little <christopher@story-ai.com>
 :imagesdir: assets
 
-This service provides a boilerplate for other Story services.
-It is mostly written in TypeScript, and runs off-chain on a private cloud to
-protect API keys. It is currently
-deployed at https://api.axontoken.com.
+This service provides proxy access to teacher/manager api methods on CENTURY.
+It works by logging in using a teacher account's username and password, and 
+then using the returned API token to make subsequent requests.
+It is mostly written in TypeScript. 
 
 == Documentation
 
-The API is documented with an
+The API is (loosely) documented with an
 https://github.com/OAI/OpenAPI-Specification[OpenAPI] specification, which is
 served on the `{service-base}/spec` endpoint. We currently use this specification to 
 generate automated documentation, but it will also be used to generate client libraries.
 
 Sample Service:: 
-http://petstore.swagger.io/?url=https://api.axontoken.com/sample/spec[Documentation]
-(https://api.axontoken.com/sample/spec[specification])
+http://petstore.swagger.io/?url=https://api.story-ai.com/class/spec[Documentation]
+(https://api.story-ai.com/class/spec[specification])
 
 == Run it yourself
 
-This service runs on a serverless architecture (currently targetting AWS),
+This service runs on a serverless architecture (currently targeting AWS),
 and is managed with the https://serverless.com/[Serverless Framework]. We
 take advantage of the
 https://github.com/dherault/serverless-offline[serverless-offline] plugin for
@@ -30,8 +30,8 @@ rapid development without deployment.
 
 ```
 npm install serverless -g                                   
-git clone git@github.com:story-ai/sample-service.git
-cd sample-service
+git clone git@github.com:story-ai/class-service.git
+cd class-service
 npm install                                                 
 vim keys.yml    # Edit to add correct credentials and API keys
 ```
@@ -49,10 +49,4 @@ Then run:
 ```
 serverless deploy
 ```
-
-
-== Contributing
-
-Contributions are welcome! Suggestions for amenable problems will be added
-here as they are discovered.
 

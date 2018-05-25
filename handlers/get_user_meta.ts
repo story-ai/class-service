@@ -54,13 +54,15 @@ export async function createUserMeta(
   );
 
   // create a new class in Century
-  const { data: { id: classId } } = await axios.post<{ id: string }>(
+  const {
+    data: { id: classId }
+  } = await axios.post<{ id: string }>(
     "https://api.century.tech/accounts/v2/classes",
     {
       name: `${userResult.personal.name.first}'s Story Class`,
       organisation: CENTURY_ORG_ID,
       type: "custom",
-      isTest: true
+      isTest: process.env.STAGE !== "prod"
     },
     {
       headers: {

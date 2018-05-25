@@ -43,6 +43,10 @@ async function simpleHandler(
   receipt_email?: string
 ): Result<{ success: boolean; message?: string }> {
   try {
+    console.log(
+      `ADDING COURSE ${prismicCourseId} TO USER ${userId} [${receipt_email}]`
+    );
+
     if (userId === undefined || userId.length < 1)
       throw new Error("User ID invalid");
     if (prismicCourseId === undefined || prismicCourseId.length < 1)
@@ -60,13 +64,10 @@ async function simpleHandler(
 
     let validDiscount: StoryTypes.Discount | undefined;
 
-    if (discount !== undefined) {
-      // TODO: validate that this user is allowed this discount
-      console.log("My discount", discount);
-      console.log("Available", userMeta.discounts);
+    if (discount != undefined && discount != null) {
       validDiscount = userMeta.discounts.find(d => d._id === discount._id);
-      console.log("Found", validDiscount);
       if (validDiscount === undefined) throw new Error("Invalid discount");
+      console.log(`\tApplying discount ${validDiscount.value}`);
     }
 
     const price = Math.max(
@@ -81,10 +82,10 @@ async function simpleHandler(
         throw new Error("Stripe token is invalid");
       }
 
-      console.log("Sending receipt to ", receipt_email);
       // Charge the user's card:
+      console.log("\tCharging " + price);
       const charge = await stripe.charges.create({
-        amount: price * 100,
+        amount: Math.ceil(price * 100),
         currency: "GBP",
         description: "Story Course: " + courseDetails.name,
         source: stripeToken,
@@ -103,7 +104,7 @@ async function simpleHandler(
               : d
         )
         // remove any discounts that have been fully used up
-        .filter(d => d.value > 0);
+        .filter(d => d.value > 0.02);
 
       const result = await docClient
         .update({
@@ -119,6 +120,12 @@ async function simpleHandler(
         })
         .promise();
     }
+
+    console.log(
+      `\tAdding Century Course ${courseId}[${courseDetails.name}] to class ${
+        userMeta.class
+      }`
+    );
 
     // now that's done, we can actually add the course to the user's class
     await assignCourse(userMeta.class, courseId, courseDetails.name);
@@ -149,11 +156,34 @@ async function simpleHandler(
   }
 }
 
+async function getClassCourses(courseId: string): Promise<string[]> {
+  const token = await fetchToken();
+  const classes = await axios.get<{ course: string }[]>(
+    `https://api.century.tech/accounts/v2/study-groups?include=course&class=${courseId}`,
+    {
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json"
+      }
+    }
+  );
+  if (classes.status !== 200) {
+    throw new Error("Could not get current classes for user");
+  }
+  return classes.data.map(x => x.course);
+}
+
 async function assignCourse(
   classId: string,
   courseId: string,
   courseName: string
 ): Promise<any> {
+  // before we go any further, check if this user already has access to the course
+  const existingCourses = await getClassCourses(classId);
+  if (existingCourses.indexOf(courseId) >= 0) {
+    throw new Error("Course has already been assigned");
+  }
+
   const token = await fetchToken();
   type Job = {
     contentResponse: null;
@@ -166,13 +196,12 @@ async function assignCourse(
     startTime: string | null;
     status: "waiting" | "success" | "running";
   };
-
   return waitForJob(
     axios.post<Job>(
       "https://api.century.tech/palpatine/api/v1/studygroups",
       {
         name: courseName + " Study Group",
-        isTest: true,
+        isTest: process.env.STAGE !== "prod",
         classId,
         courseId,
         filter: { classes: [classId] },
