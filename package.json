@@ -5,24 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "_dynamo":
-      "aws dynamodb --profile story-serverless --region eu-west-2 batch-write-item --request-items ",
+    "_dynamo": "aws dynamodb --profile story-serverless --region eu-west-2 batch-write-item --request-items ",
     "prod-data-class": "npm run _dynamo -- file://data/prod/class.json",
     "prod-data-user": "npm run _dynamo -- file://data/prod/user.json",
     "prod-data-teacher": "npm run _dynamo -- file://data/prod/teacher.json",
     "prod-data-course": "npm run _dynamo -- file://data/prod/course.json",
-    "prod-data-discount-templates":
-      "npm run _dynamo -- file://data/prod/discount-templates.json",
-    "prod-data":
-      "npm run prod-data-class && npm run prod-data-teacher && npm run prod-data-user && npm run prod-data-course && npm run prod-data-discount-templates",
+    "prod-data-discount-templates": "npm run _dynamo -- file://data/prod/discount-templates.json",
+    "prod-data": "npm run prod-data-class && npm run prod-data-teacher && npm run prod-data-user && npm run prod-data-course && npm run prod-data-discount-templates",
     "dev-data-class": "npm run _dynamo -- file://data/dev/class.json",
     "dev-data-user": "npm run _dynamo -- file://data/dev/user.json",
     "dev-data-teacher": "npm run _dynamo -- file://data/dev/teacher.json",
     "dev-data-course": "npm run _dynamo -- file://data/dev/course.json",
-    "dev-data-discount-templates":
-      "npm run _dynamo -- file://data/dev/discount-templates.json",
-    "dev-data":
-      "npm run dev-data-class && npm run dev-data-teacher && npm run dev-data-user && npm run dev-data-course && npm run dev-data-discount-templates"
+    "dev-data-discount-templates": "npm run _dynamo -- file://data/dev/discount-templates.json",
+    "dev-data": "npm run dev-data-class && npm run dev-data-teacher && npm run dev-data-user && npm run dev-data-course && npm run dev-data-discount-templates"
   },
   "engines": {
     "node": ">=6.10.3"
@@ -39,12 +34,12 @@
     "jwt-decode": "^2.2.0",
     "lodash": "^4.17.5",
     "node-fetch": "^1.7.3",
+    "prismic-javascript": "^1.5.0-beta.3",
     "randomatic": "^2.0.0",
     "serverless-spec-uploader": "^0.2.0",
     "story-backend-utils": "^0.1.16",
     "stripe": "^5.8.0",
-    "uuid": "^3.2.1",
-    "prismic-javascript": "^1.5.0-beta.2"
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@types/aws-lambda": "^0.0.19",
